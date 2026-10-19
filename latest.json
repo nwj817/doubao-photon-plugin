@@ -1,0 +1,5 @@
+{
+  "version": "1.6.0",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.6.0.zip",
+  "note": "新增：面板内「检查更新」——打开面板自动检测最新版本，发现新版即提示下载更新。"
+}

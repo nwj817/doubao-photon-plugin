@@ -1,0 +1,65 @@
+{
+  "manifestVersion": 1,
+  "sdkVersion": 1,
+  "id": "doubao.creative",
+  "name": "豆包 AI 创作",
+  "version": "1.6.0",
+  "main": "index.html",
+  "panels": [
+    {
+      "id": "main",
+      "label": "豆包 AI 创作",
+      "ui": "custom",
+      "minimumSize": { "width": 420, "height": 620 }
+    }
+  ],
+  "commands": [
+    {
+      "id": "open.main",
+      "label": "豆包 AI 创作",
+      "scope": "app",
+      "panel": "main",
+      "menu": "Plugins",
+      "keywords": ["豆包", "doubao", "AI", "生图", "翻译", "创作"]
+    },
+    {
+      "id": "open.generate",
+      "label": "豆包：文生图",
+      "scope": "document",
+      "panel": "main",
+      "menu": "Plugins",
+      "keywords": ["豆包", "生图", "AI 绘图", "生成图片"]
+    },
+    {
+      "id": "open.edit",
+      "label": "豆包：图生图 / 编辑",
+      "scope": "document",
+      "panel": "main",
+      "menu": "Plugins",
+      "keywords": ["豆包", "改图", "图生图", "编辑图片"]
+    },
+    {
+      "id": "open.merge",
+      "label": "豆包：多图融合",
+      "scope": "document",
+      "panel": "main",
+      "menu": "Plugins",
+      "keywords": ["豆包", "融合", "合成", "多图"]
+    },
+    {
+      "id": "open.translate",
+      "label": "豆包：翻译",
+      "scope": "document",
+      "panel": "main",
+      "menu": "Plugins",
+      "keywords": ["豆包", "翻译", "多语言", "译文"]
+    }
+  ],
+  "permissions": {
+    "document": "readWrite",
+    "network": ["https://ark.cn-beijing.volces.com", "https://raw.githubusercontent.com"],
+    "credentials": true,
+    "customEndpoints": true,
+    "files": true
+  }
+}
