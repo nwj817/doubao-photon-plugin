@@ -1390,30 +1390,52 @@
 
   /* ---------- 检查更新（GitHub latest.json 对比） ---------- */
   var PLUGIN_VERSION = "1.6.1";
-  var UPDATE_URL = "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/latest.json";
+  var REPO = "nwj817/doubao-photon-plugin";
+  // 更新信息多源探测：按顺序尝试，哪个可达用哪个（国内网络下 api.github.com 最稳，raw/CDN 兜底）
+  var UPD_SOURCES = [
+    "https://api.github.com/repos/" + REPO + "/contents/latest.json",
+    "https://raw.githubusercontent.com/" + REPO + "/main/latest.json",
+    "https://cdn.jsdelivr.net/gh/" + REPO + "@main/latest.json",
+    "https://cdn.staticaly.com/gh/" + REPO + "@main/latest.json"
+  ];
   function renderUpdateInfo(html) {
     $("updBody").innerHTML = '<div style="padding:6px 2px">' + html + "</div>";
     $("updPanel").classList.remove("hidden");
+  }
+  function fetchUpdateInfo() {
+    var chain = Promise.reject(new Error("no source"));
+    UPD_SOURCES.forEach(function (src) {
+      chain = chain.catch(function () {
+        return SDK.network.request({ method: "GET", url: src }).then(function (r) {
+          var text = "";
+          if (r && typeof r.body === "string") text = r.body;
+          else if (r && r.body && typeof r.body.content === "string") text = atob(r.body.content); // api.github.com 返回 base64
+          if (!text) throw new Error("empty response");
+          var data = JSON.parse(text);
+          if (!data || !data.version) throw new Error("bad update info");
+          return data;
+        });
+      });
+    });
+    return chain;
   }
   function checkUpdate(silent) {
     if (!SDK.network || typeof SDK.network.request !== "function") {
       if (!silent) renderUpdateInfo("当前环境不支持网络请求（SDK.network 不可用）");
       return;
     }
-    SDK.network.request({ method: "GET", url: UPDATE_URL }).then(function (r) {
-      var data = null;
+    // 静默自动检查 + 近期已确认最新 → 跳过（省网络请求）
+    if (silent) {
       try {
-        if (r && typeof r.body === "string") data = JSON.parse(r.body);
-        else if (r && r.body) data = r.body;
-      } catch (e) { data = null; }
-      var latest = data && data.version;
-      if (!latest) {
-        if (!silent) renderUpdateInfo('<div class="hint" style="text-align:center;margin-top:16px">无法解析更新信息（latest.json 缺失或格式错误）</div>');
-        return;
-      }
+        var cached = JSON.parse(localStorage.getItem("doubao.updCheck") || "{}");
+        if (cached && cached.v === PLUGIN_VERSION && (Date.now() - (cached.t || 0)) < 10 * 60 * 1000) return;
+      } catch (e) { }
+    }
+    fetchUpdateInfo().then(function (data) {
+      var latest = data.version;
       if (String(latest) === PLUGIN_VERSION) {
+        try { localStorage.setItem("doubao.updCheck", JSON.stringify({ t: Date.now(), v: PLUGIN_VERSION })); } catch (e) { }
         if (!silent) renderUpdateInfo('<div class="hint" style="text-align:center;margin-top:16px">当前已是最新版本 <b style="color:var(--ph-text)">v' + esc(PLUGIN_VERSION) + "</b></div>");
-        // silent 且无新版：不打扰
       } else {
         renderUpdateInfo(
           '<div style="font-size:var(--ph-text-sm);margin-bottom:8px">发现新版本：<b style="color:var(--ph-accent);font-size:var(--ph-text)">v' + esc(latest) + "</b>（当前 v" + esc(PLUGIN_VERSION) + "）</div>" +
@@ -1421,21 +1443,37 @@
           '<div style="margin-bottom:10px">更新步骤：点「下载更新包」保存 zip → 解压 → 退出 Photon → 双击「一键安装豆包插件.bat」→ 重启 Photon。</div>' +
           '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
           '<button class="btn primary" data-act="dlzip" data-url="' + escAttr(data.zip || "") + '">下载更新包</button>' +
-          '<button class="btn" data-act="copy" data-text="' + escAttr(data.zip || UPDATE_URL) + '">复制下载链接</button>' +
+          '<button class="btn" data-act="copy" data-text="' + escAttr(data.zip || ("https://raw.githubusercontent.com/" + REPO + "/main/latest.json")) + '">复制下载链接</button>' +
           '</div>'
         );
         if (silent) setFoot("发现新版本 v" + latest + "，点「检查更新」查看");
       }
     }).catch(function (e) {
-      if (!silent) renderUpdateInfo("检查失败：" + friendlyErr(e.message || String(e)) + "<br>请确认网络可用，并在首次弹窗中允许访问 raw.githubusercontent.com");
+      if (!silent) renderUpdateInfo("检查失败：" + friendlyErr(e.message || String(e)) + "<br>当前网络可能无法访问 GitHub 更新源，请稍后重试，或直接访问仓库 <b>github.com/" + esc(REPO) + "</b> 手动下载更新。");
     });
   }
 
-  /* 一键下载更新包：尝试经 SDK.network 拉取二进制并触发保存；不可行则复制链接 */
+  /* 一键下载更新包：优先走 api.github.com 二进制（base64），失败再试直链；都不可行则复制链接 */
   function str2bin(s) {
     var n = s.length, u = new Uint8Array(n);
     for (var i = 0; i < n; i++) u[i] = s.charCodeAt(i) & 0xff;
     return u;
+  }
+  function zipPathFromUrl(url) {
+    var m = /\/releases\/[^\/?#]+\.zip/i.exec(url || "");
+    return m ? m[0].replace(/^\//, "") : "";
+  }
+  function saveZipBlob(bytes, url) {
+    var blob = new Blob([bytes], { type: "application/zip" });
+    var name = "doubao-photon-panel-v" + PLUGIN_VERSION + ".zip";
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 30000);
+    renderUpdateInfo("下载已开始：保存 <b>" + esc(name) + "</b> → 解压 → 退出 Photon → 双击「一键安装豆包插件.bat」→ 重启 Photon 即完成更新。");
   }
   function downloadZip(url) {
     if (!url) { renderUpdateInfo("更新包地址为空，请点「复制下载链接」手动下载"); return; }
@@ -1443,32 +1481,29 @@
       renderUpdateInfo("当前环境不支持网络下载，请点「复制下载链接」在浏览器中打开下载"); return;
     }
     setFoot("正在下载更新包…");
-    SDK.network.request({ method: "GET", url: url }).then(function (r) {
-      var body = r && r.body !== undefined ? r.body : (r && r.data !== undefined ? r.data : null);
-      if (body === null || body === undefined) { setFoot("下载失败：响应为空"); renderUpdateInfo("下载失败：响应为空，请点「复制下载链接」手动下载"); return; }
-      try {
+    var apiUrl = "https://api.github.com/repos/" + REPO + "/contents/" + zipPathFromUrl(url);
+    SDK.network.request({ method: "GET", url: apiUrl }).then(function (r) {
+      if (r && r.body && typeof r.body.content === "string") {
+        var bytes = str2bin(atob(r.body.content));
+        if (bytes && bytes.length >= 5000) { saveZipBlob(bytes, url); return; }
+      }
+      throw new Error("api binary unavailable");
+    }).catch(function () {
+      // 兜底：直链下载
+      return SDK.network.request({ method: "GET", url: url }).then(function (r) {
+        var body = r && r.body !== undefined ? r.body : (r && r.data !== undefined ? r.data : null);
+        if (body === null || body === undefined) throw new Error("empty response");
         var bytes = null;
         if (typeof body === "string") bytes = str2bin(body);
         else if (body instanceof ArrayBuffer) bytes = new Uint8Array(body);
         else if (body && body.buffer) bytes = new Uint8Array(body.buffer);
-        if (!bytes || bytes.length < 5000) throw new Error("数据异常");
-        var blob = new Blob([bytes], { type: "application/zip" });
-        var a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "doubao-photon-panel-" + PLUGIN_VERSION + ".zip";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(function () { URL.revokeObjectURL(a.href); }, 30000);
-        renderUpdateInfo("下载已开始：保存 <b>doubao-photon-panel-" + esc(PLUGIN_VERSION) + '.zip</b> → 解压 → 退出 Photon → 双击「一键安装豆包插件.bat」→ 重启 Photon 即完成更新。');
-      } catch (e) {
+        if (!bytes || bytes.length < 5000) throw new Error("bad bytes");
+        saveZipBlob(bytes, url);
+      }).catch(function (e2) {
         setFoot("面板内保存不可用，已为你复制下载链接");
         renderUpdateInfo("当前环境无法直接保存文件，已自动复制下载链接，粘贴到浏览器打开即可下载。");
         navigator.clipboard.writeText(url).catch(function () { });
-      }
-    }).catch(function (e) {
-      setFoot("下载失败");
-      renderUpdateInfo("下载失败：" + friendlyErr(e.message || String(e)) + "，请点「复制下载链接」手动下载。");
+      });
     });
   }
 
@@ -1719,7 +1754,10 @@
         // 请求端点批准（若 Photon 弹出 Allow endpoint 窗口，请点 Allow）
         if (SDK.network && SDK.network.allowEndpoint) {
           SDK.network.allowEndpoint(ARK_ORIGIN).catch(function () { });
+          SDK.network.allowEndpoint("https://api.github.com").catch(function () { });
           SDK.network.allowEndpoint("https://raw.githubusercontent.com").catch(function () { });
+          SDK.network.allowEndpoint("https://cdn.jsdelivr.net").catch(function () { });
+          SDK.network.allowEndpoint("https://cdn.staticaly.com").catch(function () { });
         }
         // 打开面板自动检查一次更新（有新版才提示）
         checkUpdate(true);
