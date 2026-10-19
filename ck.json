@@ -1,0 +1,18 @@
+﻿{
+  "name": "latest.json",
+  "path": "latest.json",
+  "sha": "be55c0bf9536a5e58b28377969e5ddec541fc46a",
+  "size": 275,
+  "url": "https://api.github.com/repos/nwj817/doubao-photon-plugin/contents/latest.json?ref=main",
+  "html_url": "https://github.com/nwj817/doubao-photon-plugin/blob/main/latest.json",
+  "git_url": "https://api.github.com/repos/nwj817/doubao-photon-plugin/git/blobs/be55c0bf9536a5e58b28377969e5ddec541fc46a",
+  "download_url": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/latest.json",
+  "type": "file",
+  "content": "ewogICJ2ZXJzaW9uIjogIjEuNi4wIiwKICAiemlwIjogImh0dHBzOi8vcmF3\nLmdpdGh1YnVzZXJjb250ZW50LmNvbS9ud2o4MTcvZG91YmFvLXBob3Rvbi1w\nbHVnaW4vbWFpbi9yZWxlYXNlcy9kb3ViYW8tcGhvdG9uLXBhbmVsLXYxLjYu\nMC56aXAiLAogICJub3RlIjogIuaWsOWinu+8mumdouadv+WGheOAjOajgOaf\npeabtOaWsOOAjeKAlOKAlOaJk+W8gOmdouadv+iHquWKqOajgOa1i+acgOaW\nsOeJiOacrO+8jOWPkeeOsOaWsOeJiOWNs+aPkOekuuS4i+i9veabtOaWsOOA\ngiIKfQo=\n",
+  "encoding": "base64",
+  "_links": {
+    "self": "https://api.github.com/repos/nwj817/doubao-photon-plugin/contents/latest.json?ref=main",
+    "git": "https://api.github.com/repos/nwj817/doubao-photon-plugin/git/blobs/be55c0bf9536a5e58b28377969e5ddec541fc46a",
+    "html": "https://github.com/nwj817/doubao-photon-plugin/blob/main/latest.json"
+  }
+}

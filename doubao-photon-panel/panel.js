@@ -1389,7 +1389,7 @@
   }
 
   /* ---------- 检查更新（GitHub latest.json 对比） ---------- */
-  var PLUGIN_VERSION = "1.6.0";
+  var PLUGIN_VERSION = "1.6.1";
   var UPDATE_URL = "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/latest.json";
   function renderUpdateInfo(html) {
     $("updBody").innerHTML = '<div style="padding:6px 2px">' + html + "</div>";
@@ -1418,13 +1418,57 @@
         renderUpdateInfo(
           '<div style="font-size:var(--ph-text-sm);margin-bottom:8px">发现新版本：<b style="color:var(--ph-accent);font-size:var(--ph-text)">v' + esc(latest) + "</b>（当前 v" + esc(PLUGIN_VERSION) + "）</div>" +
           (data.note ? '<div style="margin-bottom:10px;white-space:pre-wrap">' + esc(data.note) + "</div>" : "") +
-          '<div style="margin-bottom:10px">更新步骤：下载安装包 → 解压 → 退出 Photon → 双击「一键安装豆包插件.bat」→ 重启 Photon。</div>' +
-          '<button class="btn primary" data-act="copy" data-text="' + escAttr(data.zip || UPDATE_URL) + '">复制下载链接</button>'
+          '<div style="margin-bottom:10px">更新步骤：点「下载更新包」保存 zip → 解压 → 退出 Photon → 双击「一键安装豆包插件.bat」→ 重启 Photon。</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+          '<button class="btn primary" data-act="dlzip" data-url="' + escAttr(data.zip || "") + '">下载更新包</button>' +
+          '<button class="btn" data-act="copy" data-text="' + escAttr(data.zip || UPDATE_URL) + '">复制下载链接</button>' +
+          '</div>'
         );
         if (silent) setFoot("发现新版本 v" + latest + "，点「检查更新」查看");
       }
     }).catch(function (e) {
       if (!silent) renderUpdateInfo("检查失败：" + friendlyErr(e.message || String(e)) + "<br>请确认网络可用，并在首次弹窗中允许访问 raw.githubusercontent.com");
+    });
+  }
+
+  /* 一键下载更新包：尝试经 SDK.network 拉取二进制并触发保存；不可行则复制链接 */
+  function str2bin(s) {
+    var n = s.length, u = new Uint8Array(n);
+    for (var i = 0; i < n; i++) u[i] = s.charCodeAt(i) & 0xff;
+    return u;
+  }
+  function downloadZip(url) {
+    if (!url) { renderUpdateInfo("更新包地址为空，请点「复制下载链接」手动下载"); return; }
+    if (!SDK.network || typeof SDK.network.request !== "function") {
+      renderUpdateInfo("当前环境不支持网络下载，请点「复制下载链接」在浏览器中打开下载"); return;
+    }
+    setFoot("正在下载更新包…");
+    SDK.network.request({ method: "GET", url: url }).then(function (r) {
+      var body = r && r.body !== undefined ? r.body : (r && r.data !== undefined ? r.data : null);
+      if (body === null || body === undefined) { setFoot("下载失败：响应为空"); renderUpdateInfo("下载失败：响应为空，请点「复制下载链接」手动下载"); return; }
+      try {
+        var bytes = null;
+        if (typeof body === "string") bytes = str2bin(body);
+        else if (body instanceof ArrayBuffer) bytes = new Uint8Array(body);
+        else if (body && body.buffer) bytes = new Uint8Array(body.buffer);
+        if (!bytes || bytes.length < 5000) throw new Error("数据异常");
+        var blob = new Blob([bytes], { type: "application/zip" });
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "doubao-photon-panel-" + PLUGIN_VERSION + ".zip";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 30000);
+        renderUpdateInfo("下载已开始：保存 <b>doubao-photon-panel-" + esc(PLUGIN_VERSION) + '.zip</b> → 解压 → 退出 Photon → 双击「一键安装豆包插件.bat」→ 重启 Photon 即完成更新。');
+      } catch (e) {
+        setFoot("面板内保存不可用，已为你复制下载链接");
+        renderUpdateInfo("当前环境无法直接保存文件，已自动复制下载链接，粘贴到浏览器打开即可下载。");
+        navigator.clipboard.writeText(url).catch(function () { });
+      }
+    }).catch(function (e) {
+      setFoot("下载失败");
+      renderUpdateInfo("下载失败：" + friendlyErr(e.message || String(e)) + "，请点「复制下载链接」手动下载。");
     });
   }
 
@@ -1527,6 +1571,8 @@
           btn.textContent = "已复制"; setFoot("已复制到剪贴板");
           setTimeout(function () { btn.textContent = "复制"; }, 1500);
         }).catch(function () { setFoot("复制失败"); });
+      } else if (act === "dlzip") {
+        downloadZip(btn.dataset.url || "");
       } else if (act === "copyurl") {
         var a = btn.parentElement.parentElement.querySelector("a");
         navigator.clipboard.writeText(a ? a.href : "").then(function () {
