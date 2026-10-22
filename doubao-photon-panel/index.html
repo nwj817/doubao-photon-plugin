@@ -4,294 +4,423 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>豆包 AI 创作</title>
-<style>  /* ============ 深色科技 · PS 原生面板风格（豆包 AI 创作） ============ */
+<style>  /* ============ 霓虹玻璃 Neo-Glass 主题（豆包 AI 创作） ============ */
   :root {
     color-scheme: dark;
-    --c-side:#0F1118;           /* 左侧导航背景 */
-    --c-top:#151823;            /* 顶部通栏 / 主内容背景 */
-    --c-main:#151823;
-    --c-card:#1B1F2E;           /* 卡片背景 */
-    --c-input:#0E1118;          /* 输入/控件背景 */
-    --c-input-hover:#141826;
-    --c-input-active:#171C2D;
-    --t1:#E8ECF4;               /* 一级文字 */
-    --t2:#9AA3B5;               /* 二级文字 */
-    --t3:#5F6879;               /* 三级文字 / 禁用 */
-    --b1:#5B7CFF;               /* 蓝紫渐变主色（蓝） */
-    --b2:#8B5CF6;               /* 蓝紫渐变主色（紫） */
-    --grad:linear-gradient(90deg,#5B7CFF 0%,#8B5CF6 100%);
-    --grad-bg:linear-gradient(180deg,rgba(91,124,255,0.14),rgba(139,92,246,0.14));
-    --sel:rgba(91,124,255,0.10);   /* 选中项 10% 主色填充 */
-    --stroke:#252C3E;
-    --stroke-2:#1B2232;
-    --danger:#F97066;
-    --danger-bg:rgba(249,112,102,0.12);
-    --fs1:13px; --fs2:12px; --fs3:11px;
-    --r:8px;
-    --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",ui-sans-serif,system-ui,sans-serif;
-    --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --ph-bg:#05070f;
+    --ph-bg2:#0a0e1e;
+    --ph-panel:rgba(14,18,36,0.72);
+    --ph-panel-strong:rgba(17,22,44,0.88);
+    --ph-slab:rgba(148,163,210,0.07);
+    --ph-slab-hover:rgba(148,163,210,0.12);
+    --ph-sunken:rgba(6,10,24,0.62);
+    --ph-control:rgba(255,255,255,0.06);
+    --ph-control-hover:rgba(255,255,255,0.11);
+    --ph-control-active:rgba(255,255,255,0.15);
+    --ph-text:#eef2ff;
+    --ph-muted:#9aa6c7;
+    --ph-soft:#64708f;
+    --ph-accent:#22d3ee;
+    --ph-accent2:#a855f7;
+    --ph-accent3:#ec4899;
+    --ph-grad:linear-gradient(120deg,#22d3ee 0%,#a855f7 55%,#ec4899 100%);
+    --ph-grad-soft:linear-gradient(120deg,rgba(34,211,238,0.16),rgba(168,85,247,0.16) 55%,rgba(236,72,153,0.16));
+    --ph-on-accent:#07101f;
+    --ph-danger:#fb7185;
+    --ph-danger-soft:rgba(251,113,133,0.14);
+    --ph-stroke:rgba(148,163,210,0.16);
+    --ph-stroke-strong:rgba(148,163,210,0.3);
+    --ph-hairline:inset 0 0 0 1px var(--ph-stroke);
+    --ph-hairline-strong:inset 0 0 0 1px var(--ph-stroke-strong);
+    --ph-raise:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0) 60%);
+    --ph-glow-input-focus:inset 0 0 0 1px rgba(34,211,238,0.5), inset 0 0 18px rgba(34,211,238,0.06), 0 0 16px rgba(34,211,238,0.18);
+    --ph-glow-accent-sm:0 0 9px rgba(34,211,238,0.55);
+    --ph-glow-btn:0 6px 18px rgba(88,101,242,0.32), 0 0 22px rgba(168,85,247,0.22);
+    --ph-glow-btn-hover:0 8px 24px rgba(88,101,242,0.42), 0 0 32px rgba(168,85,247,0.32);
+    --ph-glow-white:0 4px 18px rgba(0,0,0,0.5), 0 0 26px rgba(34,211,238,0.16);
+    --ph-glow-white-strong:0 8px 28px rgba(0,0,0,0.55), 0 0 40px rgba(168,85,247,0.22);
+    --ph-depth-inline:0 1px 2px rgba(0,0,0,0.4);
+    --ph-depth-inline-hover:0 3px 10px rgba(0,0,0,0.45);
+    --ph-rule:rgba(148,163,210,0.22);
+    --ph-rule-soft:rgba(148,163,210,0.12);
+    --ph-font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",ui-sans-serif,system-ui,sans-serif;
+    --ph-font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --ph-text-base:12px; --ph-text-md:13px; --ph-text-lg:14px; --ph-text-sm:10px; --ph-text-meta:11px; --ph-text-mono:11px;
+    --ph-leading-ui:1.35;
+    --ph-weight-regular:400; --ph-weight-medium:500; --ph-weight-semibold:600;
+    --ph-tracking-ui:-0.01em;
+    --ph-radius-6:6px; --ph-radius-7:7px; --ph-radius-8:8px; --ph-radius-9:9px; --ph-radius-11:11px; --ph-radius-12:12px; --ph-radius-pill:999px;
+    --ph-duration-hover:135ms; --ph-duration-shadow:240ms; --ph-duration-press:90ms; --ph-press-scale:0.97;
+    --ph-ease-out:cubic-bezier(0.2,0.7,0.3,1);
+    --ph-transition-control:background-color var(--ph-duration-hover) var(--ph-ease-out), background var(--ph-duration-hover) var(--ph-ease-out), color var(--ph-duration-hover) var(--ph-ease-out), box-shadow var(--ph-duration-shadow) var(--ph-ease-out), opacity var(--ph-duration-hover) var(--ph-ease-out), border-color var(--ph-duration-hover) var(--ph-ease-out);
+    --ph-transition-glow:box-shadow var(--ph-duration-shadow) var(--ph-ease-out);
+    --ph-transition-press:transform var(--ph-duration-press) var(--ph-ease-out);
   }
-  @font-face { font-family:"Inter"; font-style:normal; font-weight:100 900; font-display:swap; src:url("./fonts/inter-latin.woff2") format("woff2"); }
-  @font-face { font-family:"JetBrains Mono"; font-style:normal; font-weight:400 500; font-display:swap; src:url("./fonts/jetbrains-mono-latin.woff2") format("woff2"); }
+  @font-face {
+    font-family:"Inter"; font-style:normal; font-weight:100 900; font-display:swap;
+    src:url("./fonts/inter-latin.woff2") format("woff2");
+  }
+  @font-face {
+    font-family:"JetBrains Mono"; font-style:normal; font-weight:400 500; font-display:swap;
+    src:url("./fonts/jetbrains-mono-latin.woff2") format("woff2");
+  }
 
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;}
   body{
-    color:var(--t1); background:var(--c-main);
-    font:400 var(--fs2)/1.4 var(--font);
-    -webkit-font-smoothing:antialiased; overflow:hidden;
+    color:var(--ph-text);
+    font:var(--ph-weight-regular) var(--ph-text-base)/var(--ph-leading-ui) var(--ph-font);
+    letter-spacing:var(--ph-tracking-ui); overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(900px 420px at 15% -10%, rgba(56,189,248,0.18), transparent 60%),
+      radial-gradient(820px 460px at 112% 8%, rgba(168,85,247,0.20), transparent 55%),
+      radial-gradient(700px 420px at 80% 108%, rgba(236,72,153,0.10), transparent 60%),
+      linear-gradient(180deg, #0b1024 0%, #070a18 55%, #060814 100%);
+    background-attachment:fixed;
   }
-  ::-webkit-scrollbar{width:6px;height:6px;}
-  ::-webkit-scrollbar-thumb{background:#2A3245;border-radius:4px;}
-  ::-webkit-scrollbar-thumb:hover{background:#39425A;}
-  ::-webkit-scrollbar-track{background:transparent;}
+  .wrap{display:flex;flex-direction:column;height:100%;}
 
-  /* 面板固定宽度（窄面板 · 停靠式），高度自适应全屏 */
-  .wrap{
-    display:flex;flex-direction:column;
-    width:480px;max-width:100%;min-width:360px;height:100%;margin:0 auto;
-    background:var(--c-main);
-  }
-
-  /* ═══ 顶部通栏（40px） ═══ */
+  /* ── 顶栏（毛玻璃） ── */
   .head{
-    display:flex;align-items:center;gap:8px;flex:none;height:40px;
-    padding:0 16px;background:var(--c-top);
-    box-shadow:inset 0 -1px 0 var(--stroke-2);
+    display:flex;align-items:center;gap:9px;flex:none;
+    padding:9px 12px 8px;
+    background:rgba(13,17,34,0.55);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    box-shadow:inset 0 -1px 0 var(--ph-rule-soft), inset 0 1px 0 rgba(255,255,255,0.05);
     user-select:none;position:relative;z-index:2;
   }
-  .logo-mark{width:10px;height:10px;border-radius:3px;flex:none;background:var(--grad);}
-  .title{font-size:var(--fs2);font-weight:600;color:var(--t1);white-space:nowrap;}
-  .title small{color:var(--t3);font-weight:400;margin-left:6px;font-size:var(--fs3);}
+  .logo-mark{
+    width:8px;height:8px;border-radius:50%;flex:none;
+    background:var(--ph-grad);
+    box-shadow:0 0 10px rgba(34,211,238,0.7),0 0 20px rgba(168,85,247,0.5);
+  }
+  .title{font-size:var(--ph-text-base);font-weight:var(--ph-weight-semibold);letter-spacing:var(--ph-tracking-ui);color:var(--ph-text);white-space:nowrap;}
+  .title small{
+    color:var(--ph-soft);font-weight:var(--ph-weight-regular);margin-left:5px;
+    background:var(--ph-grad-soft);border:1px solid rgba(148,163,210,0.18);
+    border-radius:var(--ph-radius-pill);padding:1px 6px;font-size:9px;letter-spacing:0.04em;
+  }
   .spacer{flex:1;}
   .key-badge{
-    display:inline-flex;align-items:center;gap:6px;flex:none;height:24px;padding:0 10px;
-    border-radius:var(--r);color:var(--t2);background:var(--c-input);
-    box-shadow:inset 0 0 0 1px var(--stroke-2);font-size:var(--fs3);white-space:nowrap;
+    display:inline-flex;align-items:center;gap:6px;flex:none;
+    min-height:24px;padding:0 9px;border-radius:var(--ph-radius-pill);
+    color:var(--ph-muted);background:rgba(148,163,210,0.08);
+    box-shadow:var(--ph-hairline);
+    font-size:var(--ph-text-meta);white-space:nowrap;
   }
-  .key-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--t3);}
-  .key-badge.ok{color:var(--t1);}
-  .key-badge.ok .dot{background:var(--b1);box-shadow:0 0 6px rgba(91,124,255,0.9);}
-  .key-badge.err{color:var(--danger);}
-  .key-badge.err .dot{background:var(--danger);}
+  .key-badge .dot{width:5px;height:5px;border-radius:50%;background:var(--ph-soft);}
+  .key-badge.ok{color:var(--ph-text);}
+  .key-badge.ok .dot{background:var(--ph-grad);box-shadow:0 0 8px rgba(34,211,238,0.8);}
+  .key-badge.err{color:var(--ph-muted);}
+  .key-badge.err .dot{background:var(--ph-danger);box-shadow:0 0 8px rgba(251,113,133,0.7);}
 
-  /* ═══ 按钮（控件行高 32px / 主按钮 40px） ═══ */
+  /* ── 按钮 ── */
   .btn{
-    display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:none;
-    height:32px;padding:0 12px;border:0;border-radius:var(--r);cursor:pointer;
-    font:500 var(--fs2) var(--font);color:var(--t1);
-    background:var(--c-input);box-shadow:inset 0 0 0 1px var(--stroke-2);
-    transition:background-color 120ms,box-shadow 120ms;user-select:none;white-space:nowrap;
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    min-height:30px;padding:0 11px;border:0;border-radius:var(--ph-radius-8);
+    color:var(--ph-text);background:var(--ph-raise),var(--ph-control);
+    box-shadow:var(--ph-hairline),var(--ph-depth-inline);
+    font:var(--ph-weight-medium) var(--ph-text-base)/1 var(--ph-font);
+    letter-spacing:var(--ph-tracking-ui);white-space:nowrap;cursor:pointer;
+    transition:var(--ph-transition-control),var(--ph-transition-press);
   }
-  .btn:hover{background:var(--c-input-hover);box-shadow:inset 0 0 0 1px var(--stroke);}
-  .btn:active{background:var(--c-input-active);}
-  .btn:disabled{opacity:0.45;cursor:not-allowed;}
-  .btn.small{height:24px;padding:0 8px;font-size:var(--fs3);}
-  .btn.ghost{background:transparent;box-shadow:none;color:var(--t2);}
-  .btn.ghost:hover{color:var(--t1);background:var(--c-input);box-shadow:inset 0 0 0 1px var(--stroke-2);}
+  .btn:hover:not(:disabled){
+    background:var(--ph-raise),var(--ph-control-hover);
+    box-shadow:var(--ph-hairline-strong),var(--ph-depth-inline-hover),0 0 14px rgba(34,211,238,0.18);
+  }
+  .btn:active:not(:disabled){transform:scale(var(--ph-press-scale));}
+  .btn:disabled{opacity:0.45;cursor:default;background:transparent;box-shadow:none;}
   .btn.primary{
-    background:var(--grad);color:#fff;box-shadow:0 2px 10px rgba(91,124,255,0.25);
+    color:#fff;background:linear-gradient(120deg,#22d3ee 0%,#818cf8 50%,#a855f7 100%);
+    box-shadow:var(--ph-glow-btn),inset 0 1px 0 rgba(255,255,255,0.28);
+    text-shadow:0 1px 2px rgba(5,8,20,0.35);
   }
-  .btn.primary:hover{filter:brightness(1.08);box-shadow:0 3px 14px rgba(91,124,255,0.35);}
-  .btn.primary:active{filter:brightness(0.96);}
+  .btn.primary:hover:not(:disabled){
+    color:#fff;background:linear-gradient(120deg,#38d5f0 0%,#8a96fa 50%,#b564f8 100%);
+    box-shadow:var(--ph-glow-btn-hover),inset 0 1px 0 rgba(255,255,255,0.32);
+  }
+  .btn.primary:disabled{color:rgba(238,242,255,0.55);background:rgba(129,140,248,0.4);box-shadow:none;text-shadow:none;}
+  .btn.ghost{color:var(--ph-muted);background:transparent;box-shadow:none;}
+  .btn.ghost:hover:not(:disabled){color:var(--ph-text);background:var(--ph-control);box-shadow:var(--ph-hairline);}
+  .btn.small{min-height:24px;padding:0 8px;border-radius:var(--ph-radius-7);font-size:var(--ph-text-base);}
+  .btn svg{flex:none;}
 
-  /* ═══ 主体：左侧导航 + 主内容 ═══ */
-  .body{display:flex;flex:1;min-height:0;}
-  .side{width:190px;flex:none;background:var(--c-side);padding:16px 0;display:flex;flex-direction:column;gap:8px;user-select:none;overflow-y:auto;}
+  /* ── 主体：左侧栏 + 内容 ── */
+  .body{flex:1;min-height:0;display:flex;}
+  .side{
+    flex:none;width:116px;
+    display:flex;flex-direction:column;gap:2px;padding:8px 5px;
+    background:rgba(11,15,32,0.5);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    box-shadow:inset -1px 0 0 var(--ph-rule-soft);
+    overflow-y:auto;scrollbar-width:none;
+  }
+  .side::-webkit-scrollbar{display:none;}
   .tab{
-    position:relative;display:flex;align-items:center;gap:10px;
-    height:40px;padding:0 12px;flex:none;cursor:pointer;
-    color:var(--t3);font-size:var(--fs2);
-    transition:color 120ms,background-color 120ms;
+    position:relative;display:flex;align-items:center;gap:7px;flex:none;
+    min-height:38px;padding:0 9px;border:0;border-radius:var(--ph-radius-9);
+    color:var(--ph-muted);background:transparent;box-shadow:none;
+    font:var(--ph-weight-medium) var(--ph-text-base)/1 var(--ph-font);
+    letter-spacing:var(--ph-tracking-ui);white-space:nowrap;cursor:pointer;user-select:none;
+    transition:color var(--ph-duration-hover) var(--ph-ease-out),background var(--ph-duration-hover) var(--ph-ease-out),box-shadow var(--ph-duration-hover) var(--ph-ease-out);
   }
-  .tab svg{flex:none;opacity:0.85;}
-  .tab:hover{color:var(--t2);background:rgba(255,255,255,0.03);}
-  .tab.on{color:var(--t1);background:var(--sel);font-weight:500;}
+  .tab svg{flex:none;opacity:0.72;transition:opacity var(--ph-duration-hover) var(--ph-ease-out);}
+  .tab:hover:not(.on){color:var(--ph-text);background:var(--ph-slab);}
+  .tab.on{
+    color:var(--ph-text);
+    background:linear-gradient(100deg,rgba(34,211,238,0.16),rgba(168,85,247,0.14) 70%,transparent);
+    box-shadow:inset 0 0 0 1px rgba(148,163,210,0.14);
+  }
   .tab.on::before{
-    content:"";position:absolute;left:0;top:8px;bottom:8px;width:2px;
-    background:var(--grad);border-radius:0 2px 2px 0;
+    content:"";position:absolute;left:0;top:7px;bottom:7px;width:2.5px;
+    background:var(--ph-grad);border-radius:var(--ph-radius-pill);
+    box-shadow:0 0 10px rgba(34,211,238,0.7),0 0 16px rgba(168,85,247,0.5);
+  }
+  .tab.on svg{opacity:1;filter:drop-shadow(0 0 5px rgba(34,211,238,0.6));}
+
+  .content{flex:1;min-width:0;overflow-y:auto;padding:14px 13px 16px;}
+  .view{display:none;}
+  .view.on{display:block;}
+  .field-label{
+    display:flex;align-items:center;gap:6px;
+    margin:11px 0 6px;color:var(--ph-muted);
+    font-size:var(--ph-text-meta);font-weight:var(--ph-weight-medium);
+    letter-spacing:0.02em;user-select:none;
+  }
+  .field-label:first-child{margin-top:0;}
+
+  input[type=text],textarea,select{
+    width:100%;border:0;outline:0;color:var(--ph-text);
+    background:var(--ph-sunken);box-shadow:var(--ph-hairline);
+    border-radius:var(--ph-radius-9);
+    font:var(--ph-weight-regular) var(--ph-text-base)/1.45 var(--ph-font);
+    letter-spacing:var(--ph-tracking-ui);
+    transition:var(--ph-transition-control),var(--ph-transition-glow);
+  }
+  input[type=text],select{min-height:32px;padding:0 10px;}
+  textarea{min-height:72px;padding:8px 10px;resize:vertical;line-height:1.5;}
+  textarea.small{min-height:44px;}
+  input[type=text]:focus,textarea:focus{
+    background:rgba(10,15,34,0.75);
+    box-shadow:var(--ph-hairline-strong),var(--ph-glow-input-focus);
+  }
+  input[type=text]::placeholder,textarea::placeholder{color:var(--ph-soft);}
+  select{
+    appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239aa6c7' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 9px center;background-size:10px;
+    padding-right:28px;cursor:pointer;
+  }
+  select:hover{background-color:var(--ph-control);}
+  select:focus{background-color:rgba(10,15,34,0.75);box-shadow:var(--ph-hairline-strong),var(--ph-glow-input-focus);}
+
+  .row{display:flex;gap:8px;align-items:flex-start;}
+  .tlbox{
+    background:rgba(23,29,56,0.5);border:1px solid rgba(148,163,210,0.16);
+    border-radius:var(--ph-radius-10,10px);padding:10px;margin-bottom:12px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.04),0 6px 18px rgba(0,0,0,0.25);
+  }
+  .tlrow{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
+  .tlrow select{flex:1;min-width:0;}
+  .tlrow .btn.small{white-space:nowrap;}
+  .tlhint{font-size:11px;color:#8b93a5;line-height:1.5;}
+  .row > *{flex:1;min-width:0;}
+  .actions{display:flex;gap:7px;margin-top:11px;}
+  .actions .btn{flex:1;min-width:0;}
+  .hint{font-size:var(--ph-text-sm);color:var(--ph-soft);margin-top:6px;line-height:1.5;}
+
+  .pickbtn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;
+    background:rgba(34,211,238,0.05);border:1px dashed rgba(34,211,238,0.35);
+  }
+  .pickbtn:hover:not(:disabled){background:rgba(34,211,238,0.1);border-color:rgba(34,211,238,0.6);box-shadow:0 0 16px rgba(34,211,238,0.16);}
+  .pickrow{display:flex;gap:7px;margin-top:8px;}
+  .pickrow .btn{flex:1;min-width:0;}
+  .picked{
+    display:flex;align-items:center;gap:9px;
+    background:var(--ph-slab);box-shadow:var(--ph-hairline);
+    border-radius:var(--ph-radius-11);padding:8px 9px;margin-top:8px;
+    transition:box-shadow var(--ph-duration-shadow) var(--ph-ease-out),background var(--ph-duration-hover) var(--ph-ease-out);
+  }
+  .picked:hover{box-shadow:var(--ph-hairline-strong),0 0 14px rgba(168,85,247,0.14);}
+  .picked img{width:42px;height:42px;object-fit:cover;border-radius:var(--ph-radius-7);box-shadow:var(--ph-hairline);flex:none;background:var(--ph-bg);}
+  .picked .pname{flex:1;min-width:0;font-size:var(--ph-text-meta);color:var(--ph-muted);word-break:break-all;line-height:1.4;}
+  .picked .btn{flex:none;}
+  .picklist{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+  .picklist .picked{margin-top:0;}
+
+  .result{
+    margin-top:12px;background:rgba(20,26,52,0.6);
+    box-shadow:var(--ph-hairline),0 10px 26px rgba(0,0,0,0.3);
+    border-radius:var(--ph-radius-12);padding:11px 12px;
+    position:relative;
+  }
+  .result::before{
+    content:"";position:absolute;left:12px;right:12px;top:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(34,211,238,0.4),rgba(168,85,247,0.4),transparent);
+  }
+  .result .rhead{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+  .result .rhead .dot{width:5px;height:5px;border-radius:50%;background:var(--ph-grad);box-shadow:0 0 8px rgba(34,211,238,0.7);flex:none;}
+  .result .rhead .ttl{flex:1;min-width:0;font-size:var(--ph-text-meta);color:var(--ph-muted);letter-spacing:0.02em;}
+  .result pre{
+    white-space:pre-wrap;word-break:break-word;
+    font:var(--ph-weight-regular) var(--ph-text-md)/1.6 var(--ph-font);
+    letter-spacing:var(--ph-tracking-ui);color:var(--ph-text);
+    max-height:230px;overflow-y:auto;
+  }
+  .result .imgbox{text-align:center;margin-bottom:9px;}
+  .result .imgbox img{max-width:100%;max-height:270px;border-radius:var(--ph-radius-9);box-shadow:0 8px 22px rgba(0,0,0,0.4),0 0 0 1px rgba(148,163,210,0.12);background:var(--ph-bg);}
+  .result .meta{
+    font:var(--ph-weight-regular) var(--ph-text-mono)/1.5 var(--ph-font-mono);
+    color:var(--ph-soft);word-break:break-all;margin-bottom:9px;
+  }
+  .result .meta a{color:var(--ph-accent);text-decoration:none;}
+  .result .meta a:hover{text-decoration:underline;}
+  .result .rbtns{display:flex;gap:6px;flex-wrap:wrap;}
+  .result .rbtns .btn{flex:1;min-width:92px;}
+  .errbox{
+    color:var(--ph-danger);font-size:var(--ph-text-base);line-height:1.55;
+    margin-top:10px;white-space:pre-wrap;word-break:break-word;
+    background:var(--ph-danger-soft);box-shadow:var(--ph-hairline);
+    border-radius:var(--ph-radius-9);padding:8px 10px;
   }
 
-  .content{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--c-main);}
-
-  /* ═══ 视图（滚动区 + 底部固定操作区） ═══ */
-  .view{display:none;flex-direction:column;flex:1;min-height:0;}
-  .view.on{display:flex;}
-  .vbody{flex:1;min-height:0;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:16px;}
-  .actions{flex:none;padding:12px 16px;background:var(--c-main);box-shadow:inset 0 1px 0 var(--stroke-2);}
-  .actions .btn.primary{width:100%;height:42px;font-weight:600;font-size:var(--fs2);}
-
-  /* ═══ 卡片（#1B1F2E · 8px 圆角 · 12px 内边距 · 16px 卡片间距） ═══ */
-  .card{background:var(--c-card);border-radius:var(--r);box-shadow:inset 0 0 0 1px var(--stroke-2);padding:12px;display:flex;flex-direction:column;gap:8px;}
-  .card .card-title{font-size:var(--fs3);color:var(--t3);letter-spacing:0.02em;margin-bottom:0;}
-
-  /* 左标签右控件行：标签 80px 右对齐 · 行高 32 · 行距 8 */
-  .fl{display:flex;align-items:center;gap:8px;min-height:32px;}
-  .fl > .fl-label{flex:none;width:80px;text-align:right;font-size:var(--fs2);color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .fl > .ctl{flex:1;min-width:0;display:flex;align-items:center;}
-  .fl > .ctl > *{width:100%;min-width:0;}
-
-  /* ═══ 控件 ═══ */
-  .field-label{font-size:var(--fs2);color:var(--t2);display:block;}
-  .vbody > .field-label, .card > .field-label{margin:0;}
-  input[type="text"],input[type="number"],select,textarea{
-    width:100%;min-width:0;height:32px;border:0;border-radius:var(--r);
-    background:var(--c-input);color:var(--t1);
-    box-shadow:inset 0 0 0 1px var(--stroke-2);
-    font:400 var(--fs2) var(--font);padding:0 10px;outline:none;
-    transition:box-shadow 120ms;
-  }
-  select{padding:0 8px;cursor:pointer;appearance:none;
-    background-image:linear-gradient(45deg,transparent 50%,var(--t3) 50%),linear-gradient(135deg,var(--t3) 50%,transparent 50%);
-    background-position:calc(100% - 16px) 14px,calc(100% - 12px) 14px;
-    background-size:4px 4px;background-repeat:no-repeat;padding-right:26px;}
-  input[type="text"]:focus,input[type="number"]:focus,select:focus,textarea:focus{
-    box-shadow:inset 0 0 0 1px var(--b1),0 0 0 2px rgba(91,124,255,0.18);
-  }
-  textarea{height:64px;padding:8px 10px;resize:vertical;line-height:1.5;}
-  textarea#chatInput{height:56px;}
-
-  /* 双列行 */
-  .row{display:flex;gap:8px;align-items:flex-end;}
-  .row > div{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;}
-  .labrow{display:flex;align-items:center;gap:8px;min-height:32px;}
-  .labrow .spacer{flex:1;}
-
-  /* ═══ 底部状态栏（32px） ═══ */
-  .foot{
-    display:flex;align-items:center;gap:12px;flex:none;height:32px;
-    padding:0 16px;background:var(--c-top);
-    box-shadow:inset 0 1px 0 var(--stroke-2);
-    color:var(--t3);font-size:var(--fs3);user-select:none;
-  }
-  .foot #footStatus{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .foot label{display:inline-flex;align-items:center;gap:6px;color:var(--t3);cursor:pointer;white-space:nowrap;}
-  .foot label input{width:12px;height:12px;margin:0;accent-color:var(--b1);}
-  .foot #docInfo{max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--t3);}
-
-  /* ═══ 通用小组件 ═══ */
-  .hint{font-size:var(--fs3);color:var(--t3);line-height:1.5;}
-  .chk{display:flex;align-items:flex-start;gap:8px;font-size:var(--fs2);color:var(--t2);cursor:pointer;}
-  .chk input{width:13px;height:13px;margin:1px 0 0;flex:none;accent-color:var(--b1);}
-  .busy{display:none;align-items:center;gap:8px;color:var(--t2);font-size:var(--fs2);padding:8px 0;}
+  .busy{display:none;align-items:center;gap:9px;color:var(--ph-muted);font-size:var(--ph-text-base);margin-top:11px;}
   .busy.on{display:flex;}
-  .spin{width:14px;height:14px;flex:none;border-radius:50%;
-    border:2px solid var(--stroke);border-top-color:var(--b1);
-    animation:spin 0.8s linear infinite;}
-  @keyframes spin{to{transform:rotate(360deg);}}
-  .errbox{background:var(--danger-bg);color:var(--danger);border-radius:var(--r);
-    padding:8px 10px;font-size:var(--fs2);line-height:1.5;white-space:pre-wrap;word-break:break-word;}
-  .hidden{display:none !important;}
-
-  /* ═══ 结果卡片（JS 渲染） ═══ */
-  .result{background:var(--c-card);border-radius:var(--r);box-shadow:inset 0 0 0 1px var(--stroke-2);padding:12px;display:flex;flex-direction:column;gap:8px;}
-  .result .rhead{display:flex;align-items:center;gap:8px;}
-  .result .dot{width:6px;height:6px;border-radius:50%;background:var(--b1);flex:none;}
-  .result .ttl{font-size:var(--fs2);font-weight:500;color:var(--t1);flex:1;}
-  .result .imgbox{border-radius:var(--r);overflow:hidden;background:var(--c-input);box-shadow:inset 0 0 0 1px var(--stroke-2);}
-  .result .imgbox img{display:block;width:100%;height:auto;}
-  .result .meta{font-size:var(--fs3);color:var(--t3);}
-  .result .meta a{color:var(--b1);text-decoration:none;}
-  .result pre{font:400 var(--fs2)/1.5 var(--font-mono);color:var(--t1);white-space:pre-wrap;word-break:break-word;background:var(--c-input);border-radius:var(--r);padding:8px 10px;box-shadow:inset 0 0 0 1px var(--stroke-2);}
-  .rbtns{display:flex;gap:8px;flex-wrap:wrap;}
-  .rbtns .btn{flex:1;}
-
-  /* ═══ 选图区 ═══ */
-  .pickbtn{width:100%;}
-  .pickrow{display:flex;gap:8px;}
-  .pickrow .btn{flex:1;}
-  .picklist{display:flex;flex-direction:column;gap:8px;}
-  .picked{display:flex;align-items:center;gap:8px;background:var(--c-input);border-radius:var(--r);padding:6px 8px;box-shadow:inset 0 0 0 1px var(--stroke-2);}
-  .picked img{width:40px;height:40px;border-radius:6px;object-fit:cover;flex:none;background:#000;}
-  .picked .pname{flex:1;min-width:0;font-size:var(--fs3);color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .picked .btn{height:24px;padding:0 8px;font-size:var(--fs3);}
-
-  /* ═══ 比例 chips（genratio 复用） ═══ */
-  .genratio{display:flex;flex-wrap:wrap;gap:8px;}
-  .ratio{
-    display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 10px;
-    border-radius:var(--r);cursor:pointer;user-select:none;
-    font-size:var(--fs3);color:var(--t2);background:var(--c-input);
-    box-shadow:inset 0 0 0 1px var(--stroke-2);
+  .spin{
+    width:13px;height:13px;flex:none;
+    border:1.5px solid rgba(148,163,210,0.18);
+    border-top-color:#22d3ee;border-right-color:#a855f7;
+    border-radius:50%;animation:rot 0.8s linear infinite;
+    box-shadow:0 0 8px rgba(34,211,238,0.25);
   }
-  .ratio:hover{color:var(--t1);}
-  .ratio.on{color:#fff;background:var(--grad);box-shadow:none;font-weight:500;}
+  @keyframes rot{to{transform:rotate(360deg);}}
 
-  /* ═══ 尺寸方式（radio 胶囊） ═══ */
-  .sizemode{display:flex;gap:8px;}
-  .sizemode-opt{
-    display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;flex:1;
-    border-radius:var(--r);cursor:pointer;font-size:var(--fs2);color:var(--t2);
-    background:var(--c-input);box-shadow:inset 0 0 0 1px var(--stroke-2);user-select:none;
+  .foot{
+    flex:none;display:flex;align-items:center;gap:10px;
+    padding:6px 12px 7px;
+    background:rgba(13,17,34,0.55);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    box-shadow:inset 0 1px 0 var(--ph-rule-soft);
+    font-size:var(--ph-text-meta);color:var(--ph-soft);user-select:none;position:relative;z-index:2;
   }
-  .sizemode-opt input{width:13px;height:13px;margin:0;accent-color:var(--b1);}
-  .sizemode-opt:has(input:checked){color:#fff;background:var(--grad-bg);box-shadow:inset 0 0 0 1px var(--b1);}
+  .foot .spacer{flex:1;}
+  #docInfo{font-family:var(--ph-font-mono);font-size:var(--ph-text-sm);max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-  /* ═══ 对话页 ═══ */
-  .chatbar{display:flex;align-items:center;gap:8px;flex:none;padding:12px 16px 0;min-height:44px;}
-  .modebar{display:flex;align-items:center;gap:8px;flex:none;padding:8px 16px 0;}
-  .chip{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 10px;border-radius:var(--r);cursor:pointer;font-size:var(--fs3);color:var(--t2);background:var(--c-input);box-shadow:inset 0 0 0 1px var(--stroke-2);user-select:none;}
-  .chip.on{color:#fff;background:var(--grad);font-weight:500;}
-  .mode-hint{font-size:var(--fs3);color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  #chatList{flex:1;min-height:0;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:12px;}
-  .msg{display:flex;flex-direction:column;gap:4px;max-width:100%;}
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{
+    background:rgba(99,121,179,0.35);border-radius:var(--ph-radius-pill);
+    border:2px solid transparent;background-clip:padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover{background:rgba(129,140,248,0.5);border:2px solid transparent;background-clip:padding-box;}
+  ::-webkit-scrollbar-corner{background:transparent;}
+
+  /* ---------- 统一对话视图 ---------- */
+  #view-chat{display:none;flex-direction:column;height:100%;min-height:0;position:relative;}
+  #view-chat.on{display:flex;}
+  .chatbar{display:flex;align-items:center;gap:6px;margin-bottom:9px;flex-wrap:wrap;}
+  .chip{
+    font-size:var(--ph-text-sm);color:var(--ph-soft);
+    background:var(--ph-slab);box-shadow:var(--ph-hairline);
+    border-radius:999px;padding:3px 11px;cursor:pointer;user-select:none;white-space:nowrap;
+    transition:color .15s,background .15s,box-shadow .2s;
+  }
+  .chip:hover{color:var(--ph-text);}
+  .chip.on{
+    color:var(--ph-on-accent);background:var(--ph-grad);
+    box-shadow:0 0 12px rgba(168,85,247,0.35);
+    font-weight:var(--ph-weight-semibold);
+  }
+  .modebar{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+  .mode-hint{font-size:var(--ph-text-meta);color:var(--ph-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  #chatList{flex:1;min-height:0;overflow-y:auto;padding-right:3px;margin-bottom:8px;}
+  .msg{display:flex;flex-direction:column;margin-bottom:10px;}
   .msg.user{align-items:flex-end;}
   .msg.assistant{align-items:flex-start;}
-  .msg .bubble{max-width:86%;padding:8px 12px;border-radius:var(--r);font-size:var(--fs2);line-height:1.55;word-break:break-word;}
-  .msg.user .bubble{background:var(--grad);color:#fff;border-bottom-right-radius:2px;}
-  .msg.assistant .bubble{background:var(--c-card);color:var(--t1);box-shadow:inset 0 0 0 1px var(--stroke-2);border-bottom-left-radius:2px;}
-  .msg .bubble.errbubble{background:var(--danger-bg);color:var(--danger);box-shadow:inset 0 0 0 1px rgba(249,112,102,0.3);}
-  .msg .imgwrap{max-width:86%;border-radius:var(--r);overflow:hidden;box-shadow:inset 0 0 0 1px var(--stroke-2);}
-  .msg .imgwrap img{display:block;width:100%;height:auto;}
-  .msg .meta{display:flex;align-items:center;gap:6px;font-size:var(--fs3);color:var(--t3);}
-  .msg .meta .btn{height:22px;padding:0 8px;font-size:var(--fs3);}
-  .chatinput-row{flex:none;padding:8px 16px 12px;display:flex;flex-direction:column;gap:8px;background:var(--c-main);box-shadow:inset 0 1px 0 var(--stroke-2);}
-  #chatAttach{display:flex;flex-direction:column;gap:8px;}
-  .chatrow{display:flex;gap:8px;}
-  .chatrow .btn{flex:1;}
-  .chat-send{width:100%;height:42px;font-weight:600;font-size:var(--fs2);}
-
-  /* ═══ 翻译 · 文本图层联动 ═══ */
-  .tlbox{display:flex;flex-direction:column;gap:8px;}
-  .tlrow{display:flex;gap:8px;}
-  .tlrow select{flex:1;}
-  .tlrow .btn{height:32px;}
-  .tlhint{font-size:var(--fs3);color:var(--t3);line-height:1.5;}
-
-  /* ═══ 历史图库 ═══ */
-  .histitem{display:flex;gap:8px;align-items:center;background:var(--c-card);border-radius:var(--r);padding:8px;box-shadow:inset 0 0 0 1px var(--stroke-2);}
-  .histitem .histchk{width:13px;height:13px;margin:0;flex:none;accent-color:var(--b1);}
-  .histitem img{width:48px;height:48px;object-fit:cover;border-radius:6px;flex:none;background:var(--c-input);cursor:pointer;}
-  .histitem .hi-info{flex:1;min-width:0;}
-  .histitem .hi-info .hi-label{font-size:var(--fs2);color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .histitem .hi-info .hi-time{font-size:var(--fs3);color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
-  .histitem .btn{height:24px;padding:0 8px;font-size:var(--fs3);}
-  .histbar{display:flex;align-items:center;gap:8px;}
-  #histList{display:flex;flex-direction:column;gap:8px;}
-  #histCats{display:flex;flex-wrap:wrap;gap:8px;}
-  #histCats .ratio{height:24px;padding:0 10px;}
-
-  /* ═══ 弹层 ═══ */
-  .preset-panel,.sess-panel{
-    position:absolute;left:0;right:0;top:0;bottom:0;z-index:20;
-    background:var(--c-top);display:flex;flex-direction:column;
+  .msg .bubble{
+    max-width:92%;padding:8px 11px;border-radius:var(--ph-radius-9);
+    box-shadow:var(--ph-hairline);white-space:pre-wrap;word-break:break-word;
+    font-size:var(--ph-text-base);line-height:1.55;color:var(--ph-text);
   }
-  .preset-panel{left:190px;}
-  .sess-head{display:flex;align-items:center;gap:8px;flex:none;height:40px;padding:0 16px;background:var(--c-top);box-shadow:inset 0 -1px 0 var(--stroke-2);}
-  .sess-list{flex:1;min-height:0;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px;}
-  .sess-item{display:flex;align-items:center;gap:8px;background:var(--c-card);border-radius:var(--r);padding:8px 12px;box-shadow:inset 0 0 0 1px var(--stroke-2);cursor:pointer;}
-  .sess-item:hover{box-shadow:inset 0 0 0 1px var(--b1);}
+  .msg.user .bubble{
+    color:var(--ph-on-accent);
+    background:linear-gradient(135deg,rgba(34,211,238,0.9),rgba(129,140,248,0.9) 60%,rgba(168,85,247,0.9));
+    box-shadow:0 4px 16px rgba(88,101,242,0.35),0 0 18px rgba(168,85,247,0.18);
+  }
+  .msg.assistant .bubble{background:rgba(23,29,56,0.7);box-shadow:var(--ph-hairline),0 4px 14px rgba(0,0,0,0.25);}
+  .msg .bubble.errbubble{background:var(--ph-danger-soft);color:var(--ph-danger);}
+  .msg .meta{font-size:var(--ph-text-sm);color:var(--ph-soft);margin-top:3px;display:flex;align-items:center;gap:7px;}
+  .msg .imgwrap{margin-bottom:5px;}
+  .msg .imgwrap img{max-width:170px;max-height:170px;border-radius:var(--ph-radius-7);box-shadow:0 6px 16px rgba(0,0,0,0.4),0 0 0 1px rgba(148,163,210,0.12);}
+  #chatInput{width:100%;box-sizing:border-box;min-height:58px;max-height:130px;resize:vertical;}
+  .chatrow{display:flex;gap:7px;margin-top:8px;}
+  .chatrow .btn{flex:1;min-width:0;justify-content:center;}
+  #chatAttach{margin:7px 0 2px;}
+
+  /* ---------- 会话历史弹层 ---------- */
+  .sess-panel{
+    position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;
+    background:rgba(9,12,26,0.94);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border:1px solid var(--ph-stroke-strong);border-radius:var(--ph-radius-11);
+    box-shadow:0 14px 44px rgba(0,0,0,0.5),0 0 34px rgba(88,101,242,0.14);
+  }
+  .sess-panel.hidden{display:none;}
+  .sess-head{display:flex;align-items:center;gap:6px;padding:2px 0 8px;}
+  .sess-list{flex:1;min-height:0;overflow-y:auto;padding-right:3px;}
+  .sess-item{
+    display:flex;gap:8px;align-items:center;
+    background:rgba(148,163,210,0.06);box-shadow:var(--ph-hairline);
+    border-radius:var(--ph-radius-9);padding:8px 9px;margin-bottom:7px;cursor:pointer;
+    transition:background var(--ph-duration-hover) var(--ph-ease-out),box-shadow var(--ph-duration-hover) var(--ph-ease-out);
+  }
+  .sess-item:hover{
+    background:rgba(148,163,210,0.1);
+    box-shadow:0 0 0 1px rgba(34,211,238,0.4),0 0 14px rgba(34,211,238,0.14);
+  }
   .sess-body{flex:1;min-width:0;}
-  .sess-title{font-size:var(--fs2);color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .sess-meta{font-size:var(--fs3);color:var(--t3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .sess-item .btn{height:24px;padding:0 8px;font-size:var(--fs3);}
-  .preset-save{display:flex;gap:8px;flex:none;padding:12px 16px;background:var(--c-top);box-shadow:inset 0 1px 0 var(--stroke-2);}
-  .preset-save input{flex:1;}
+  .sess-title{font-size:var(--ph-text-sm);color:var(--ph-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sess-meta{font-size:var(--ph-text-meta);color:var(--ph-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  /* ---------- 文生图尺寸（固定比例 / 自定义像素 互斥） ---------- */
+  .sizemode{display:flex;gap:14px;margin-bottom:8px;}
+  .sizemode-opt{display:flex;align-items:center;gap:5px;font-size:var(--ph-text-sm);color:var(--ph-text);cursor:pointer;user-select:none;}
+  .sizemode-opt input{accent-color:var(--ph-accent2);}
+  .genratio{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+  .ratio{
+    font-size:var(--ph-text-sm);color:var(--ph-soft);
+    background:var(--ph-slab);box-shadow:var(--ph-hairline);
+    border-radius:999px;padding:3px 10px;cursor:pointer;user-select:none;
+    transition:color .15s,background .15s,box-shadow .2s;
+  }
+  .ratio:hover{color:var(--ph-text);}
+  .ratio.on{
+    color:var(--ph-on-accent);background:var(--ph-grad);
+    box-shadow:0 0 12px rgba(168,85,247,0.35);
+    font-weight:var(--ph-weight-semibold);
+  }
+  .gen-fixed.dim{opacity:.45;pointer-events:none;}
+  #genCustom.hidden{display:none;}
+  #genSizePx{color:var(--ph-muted);}
+  .labrow{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+  .chk{display:flex;align-items:center;gap:6px;font-size:var(--ph-text-sm);color:var(--ph-text);margin:10px 0 2px;cursor:pointer;user-select:none;}
+  .chk input{accent-color:var(--ph-accent2);width:13px;height:13px;margin:0;}
+  .chk input:disabled{opacity:.45;}
+  .preset-panel{
+    position:fixed;inset:20px;z-index:30;display:flex;flex-direction:column;
+    background:rgba(9,12,26,0.94);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--ph-stroke-strong);border-radius:var(--ph-radius-11);
+    box-shadow:0 14px 44px rgba(0,0,0,0.55),0 0 40px rgba(88,101,242,0.16);
+    padding:10px;
+  }
+  .preset-panel.hidden{display:none;}
+  .preset-save{display:flex;gap:7px;margin-top:8px;}
+  .preset-save input{flex:1;min-width:0;}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <!-- ═══ 顶部通栏（40px） ═══ -->
   <div class="head">
     <div class="logo-mark"></div>
     <div class="title">豆包 AI 创作<small>Photon</small></div>
@@ -302,42 +431,39 @@
   </div>
 
   <div class="body">
-    <!-- ═══ 左侧导航（190px） ═══ -->
     <div class="side" id="side">
       <div class="tab on" data-view="chat">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2.2-2.6A8 8 0 1 1 21 12z"/><path d="M8.5 10h.01M12 10h.01M15.5 10h.01"/></svg>
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2.2-2.6A8 8 0 1 1 21 12z"/><path d="M8.5 10h.01M12 10h.01M15.5 10h.01"/></svg>
         对话
       </div>
       <div class="tab" data-view="generate">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-4.5-4.5L5 21"/></svg>
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-4.5-4.5L5 21"/></svg>
         文生图
       </div>
       <div class="tab" data-view="edit">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 7v6M9 10h6"/></svg>
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 7v6M9 10h6"/></svg>
         图生图
       </div>
       <div class="tab" data-view="merge">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 8 4.5-8 4.5-8-4.5L12 2z"/><path d="m4 12.5 8 4.5 8-4.5"/><path d="m4 17 8 4.5 8-4.5"/></svg>
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 8 4.5-8 4.5-8-4.5L12 2z"/><path d="m4 12.5 8 4.5 8-4.5"/><path d="m4 17 8 4.5 8-4.5"/></svg>
         多图融合
       </div>
       <div class="tab" data-view="translate">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h10M9 3v2M6 3c0 6-2 9-2 9M4 8h6"/><path d="m10 12-1.2 2M12 17c3-3 6-6 9-9M12 17c-1 0-2-.5-3-1"/><path d="m14.5 14 4.5 7M17 16l2 5"/></svg>
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h10M9 3v2M6 3c0 6-2 9-2 9M4 8h6"/><path d="m10 12-1.2 2M12 17c3-3 6-6 9-9M12 17c-1 0-2-.5-3-1"/><path d="m14.5 14 4.5 7M17 16l2 5"/></svg>
         翻译
       </div>
       <div class="tab" data-view="outpaint">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4"/></svg>
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4"/></svg>
         扩图重绘
       </div>
       <div class="tab" data-view="history">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2.5"/></svg>
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2.5"/></svg>
         历史
       </div>
     </div>
 
-    <!-- ═══ 主内容 ═══ -->
     <div class="content" id="content">
-
-      <!-- 统一对话 -->
+      <!-- 统一对话（文案 / 提示词 / 图片分析） -->
       <div class="view on" id="view-chat">
         <div class="chatbar">
           <span class="spacer"></span>
@@ -351,24 +477,22 @@
           <span id="chatModeHint" class="mode-hint"></span>
         </div>
         <div id="chatList"></div>
-        <div class="chatinput-row">
-          <div id="chatBusy" class="busy"><div class="spin"></div>豆包正在思考…</div>
-          <div id="chatAttach"></div>
-          <textarea id="chatInput" placeholder="输入消息…（自由提问即可，Enter 发送，Shift+Enter 换行）"></textarea>
-          <div class="chatrow">
-            <button class="btn" id="chatPick">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10"/><path d="m14 13-2-2-6 6"/><circle cx="9" cy="8" r="1.5"/><path d="M18 18v4M16 20h4"/></svg>
-              选本地图片
-            </button>
-            <button class="btn" id="chatCanvas">从画布取图</button>
-          </div>
-          <button class="btn primary chat-send" id="chatSend">发送</button>
-          <div class="hint">自由提问即可；附图会随消息一起发送，支持多轮追问。</div>
+        <div id="chatBusy" class="busy"><div class="spin"></div>豆包正在思考…</div>
+        <div id="chatAttach"></div>
+        <textarea id="chatInput" placeholder="输入消息…（自由提问即可，Enter 发送，Shift+Enter 换行）"></textarea>
+        <div class="chatrow">
+          <button class="btn" id="chatPick">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10"/><path d="m14 13-2-2-6 6"/><circle cx="9" cy="8" r="1.5"/><path d="M18 18v4M16 20h4"/></svg>
+            选本地图片
+          </button>
+          <button class="btn" id="chatCanvas">从画布取图</button>
+          <button class="btn primary" id="chatSend">发送</button>
         </div>
+        <div class="hint">自由提问即可；附图会随消息一起发送，支持多轮追问。</div>
         <!-- 会话历史弹层 -->
         <div id="chatSessions" class="sess-panel hidden">
           <div class="sess-head">
-            <span style="font-size:var(--fs2);font-weight:600;color:var(--t1)">会话历史（点击恢复，删除可移除）</span>
+            <span style="font-size:var(--ph-text-sm);font-weight:600;color:var(--ph-text)">会话历史（点击恢复，删除可移除）</span>
             <span class="spacer"></span>
             <button class="btn small" id="sessClose">关闭</button>
           </div>
@@ -378,207 +502,239 @@
 
       <!-- 文生图 -->
       <div class="view" id="view-generate">
-        <div class="vbody">
-          <div class="card">
-            <div class="labrow"><span class="field-label" style="margin:0">画面描述</span><span class="spacer"></span><button class="btn small ghost" id="genPreset">提示词预设</button></div>
-            <textarea id="genPrompt" placeholder="例：白色磁吸补光灯悬浮在深色背景中，C4D超写实渲染，产品居中，柔和环形光效"></textarea>
+        <div class="labrow"><span class="field-label" style="margin:0">画面描述</span><span class="spacer"></span><button class="btn small ghost" id="genPreset">提示词预设</button></div>
+        <textarea id="genPrompt" placeholder="例：白色磁吸补光灯悬浮在深色背景中，C4D超写实渲染，产品居中，柔和环形光效"></textarea>
+        <div class="field-label">尺寸方式（二选一）</div>
+        <div class="sizemode">
+          <label class="sizemode-opt"><input type="radio" name="genSizeMode" value="fixed" checked><span>固定比例</span></label>
+          <label class="sizemode-opt"><input type="radio" name="genSizeMode" value="custom"><span>自定义像素</span></label>
+        </div>
+        <div id="genFixed">
+          <div class="genratio" id="genRatio">
+            <span class="ratio on" data-ratio="1:1">1:1</span>
+            <span class="ratio" data-ratio="4:3">4:3</span>
+            <span class="ratio" data-ratio="3:4">3:4</span>
+            <span class="ratio" data-ratio="16:9">16:9</span>
+            <span class="ratio" data-ratio="9:16">9:16</span>
+            <span class="ratio" data-ratio="3:2">3:2</span>
+            <span class="ratio" data-ratio="2:3">2:3</span>
+            <span class="ratio" data-ratio="21:9">21:9</span>
           </div>
-          <div class="card">
-            <span class="field-label">尺寸方式（二选一）</span>
-            <div class="sizemode">
-              <label class="sizemode-opt"><input type="radio" name="genSizeMode" value="fixed" checked><span>固定比例</span></label>
-              <label class="sizemode-opt"><input type="radio" name="genSizeMode" value="custom"><span>自定义像素</span></label>
+          <div class="row">
+            <div>
+              <div class="field-label">档位</div>
+              <select id="genSize"></select>
             </div>
-            <div id="genFixed">
-              <div class="genratio" id="genRatio">
-                <span class="ratio on" data-ratio="1:1">1:1</span>
-                <span class="ratio" data-ratio="4:3">4:3</span>
-                <span class="ratio" data-ratio="3:4">3:4</span>
-                <span class="ratio" data-ratio="16:9">16:9</span>
-                <span class="ratio" data-ratio="9:16">9:16</span>
-                <span class="ratio" data-ratio="3:2">3:2</span>
-                <span class="ratio" data-ratio="2:3">2:3</span>
-                <span class="ratio" data-ratio="21:9">21:9</span>
-              </div>
-              <div class="fl" style="margin-top:8px"><span class="fl-label">档位</span><div class="ctl"><select id="genSize"></select></div></div>
-              <div class="fl"><span class="fl-label">实际像素</span><div class="ctl"><input type="text" id="genSizePx" readonly placeholder="选比例与档位后显示"></div></div>
-            </div>
-            <div id="genCustom" class="hidden">
-              <div class="row">
-                <div><span class="field-label">宽度 px</span><input type="number" id="genW" min="1" placeholder="如 1024"></div>
-                <div><span class="field-label">高度 px</span><input type="number" id="genH" min="1" placeholder="如 1024"></div>
-              </div>
-              <div id="genSizeHint" class="hint"></div>
+            <div>
+              <div class="field-label">实际像素</div>
+              <input type="text" id="genSizePx" readonly placeholder="选比例与档位后显示">
             </div>
           </div>
-          <div class="card">
-            <div class="fl"><span class="fl-label">模型</span><div class="ctl"><select id="genModel"><option value="doubao-seedream-5-0-pro-260628" selected>Seedream 5.0 Pro</option><option value="doubao-seedream-4-5-251128">Seedream 4.5</option></select></div></div>
+        </div>
+        <div id="genCustom" class="hidden">
+          <div class="row">
+            <div>
+              <div class="field-label">宽度 px</div>
+              <input type="number" id="genW" min="1" placeholder="如 1024">
+            </div>
+            <div>
+              <div class="field-label">高度 px</div>
+              <input type="number" id="genH" min="1" placeholder="如 1024">
+            </div>
           </div>
-          <div id="genBusy" class="busy"><div class="spin"></div>豆包正在生成图片，约需 30-90 秒…</div>
-          <div id="genResult"></div>
+          <div id="genSizeHint" class="hint"></div>
+        </div>
+        <div class="row">
+          <div>
+            <div class="field-label">模型</div>
+            <select id="genModel"><option value="doubao-seedream-5-0-pro-260628" selected>Seedream 5.0 Pro</option><option value="doubao-seedream-4-5-251128">Seedream 4.5</option></select>
+          </div>
         </div>
         <div class="actions"><button class="btn primary" id="genRun">生成图片</button></div>
+        <div id="genBusy" class="busy"><div class="spin"></div>豆包正在生成图片，约需 30-90 秒…</div>
+        <div id="genResult"></div>
       </div>
 
       <!-- 图生图 -->
       <div class="view" id="view-edit">
-        <div class="vbody">
-          <div class="card">
-            <span class="field-label">选择参考图（本地文件 / 画布内容）</span>
-            <button class="btn pickbtn" id="editPick">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10"/><path d="m14 13-2-2-6 6"/><circle cx="9" cy="8" r="1.5"/><path d="M18 18v4M16 20h4"/></svg>
-              选择本地图片…
-            </button>
-            <div class="pickrow">
-              <button class="btn" id="editCanvas">从画布取图</button>
-              <button class="btn" id="editReverse">反推提示词</button>
-            </div>
-            <div id="editPicked"></div>
-            <div id="editRevBusy" class="busy"><div class="spin"></div>豆包正在分析参考图并反推提示词…</div>
-            <div id="editReverseOut"></div>
-          </div>
-          <div class="card">
-            <div class="labrow"><span class="field-label" style="margin:0">编辑指令</span><span class="spacer"></span><button class="btn small ghost" id="editPreset">提示词预设</button></div>
-            <textarea id="editPrompt" placeholder="例：背景改为浅灰渐变，保留产品光影与透视，外壳改为黑色皮革材质"></textarea>
-            <div class="fl"><span class="fl-label">尺寸档位</span><div class="ctl"><select id="editSize"><option value="1K">1K</option><option value="1.5K">1.5K</option><option value="2K" selected>2K</option></select></div></div>
-            <div class="fl"><span class="fl-label">模型</span><div class="ctl"><select id="editModel"><option value="doubao-seedream-4-5-251128" selected>Seedream 4.5</option><option value="doubao-seedream-5-0-pro-260628">Seedream 5.0 Pro</option></select></div></div>
-            <label class="chk"><input type="checkbox" id="editTransparent"><span>透明背景（输出透明 PNG · 仅 5.0 Pro/Flash · 建议使用透明底参考图）</span></label>
-          </div>
-          <div id="editBusy" class="busy"><div class="spin"></div>豆包正在编辑图片…</div>
-          <div id="editResult"></div>
+        <div class="field-label">选择参考图（本地文件 / 画布内容）</div>
+        <button class="btn pickbtn" id="editPick">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10"/><path d="m14 13-2-2-6 6"/><circle cx="9" cy="8" r="1.5"/><path d="M18 18v4M16 20h4"/></svg>
+          选择本地图片…
+        </button>
+        <div class="pickrow">
+          <button class="btn" id="editCanvas">从画布取图</button>
+          <button class="btn" id="editReverse">反推提示词</button>
         </div>
+        <div id="editPicked"></div>
+        <div id="editRevBusy" class="busy"><div class="spin"></div>豆包正在分析参考图并反推提示词…</div>
+        <div id="editReverseOut"></div>
+        <div class="labrow"><span class="field-label" style="margin:0">编辑指令</span><span class="spacer"></span><button class="btn small ghost" id="editPreset">提示词预设</button></div>
+        <textarea id="editPrompt" placeholder="例：背景改为浅灰渐变，保留产品光影与透视，外壳改为黑色皮革材质"></textarea>
+        <div class="row">
+          <div>
+            <div class="field-label">尺寸档位</div>
+            <select id="editSize"><option value="1K">1K</option><option value="1.5K">1.5K</option><option value="2K" selected>2K</option></select>
+          </div>
+          <div>
+            <div class="field-label">模型</div>
+            <select id="editModel"><option value="doubao-seedream-4-5-251128" selected>Seedream 4.5</option><option value="doubao-seedream-5-0-pro-260628">Seedream 5.0 Pro</option></select>
+          </div>
+        </div>
+        <label class="chk"><input type="checkbox" id="editTransparent"><span>透明背景（输出透明 PNG · 仅 5.0 Pro/Flash · 建议使用透明底参考图）</span></label>
         <div class="actions"><button class="btn primary" id="editRun">开始编辑</button></div>
+        <div id="editBusy" class="busy"><div class="spin"></div>豆包正在编辑图片…</div>
+        <div id="editResult"></div>
       </div>
 
       <!-- 多图融合 -->
       <div class="view" id="view-merge">
-        <div class="vbody">
-          <div class="card">
-            <span class="field-label">选择参考图（本地多选 / 画布内容，2-14 张）</span>
-            <button class="btn pickbtn" id="mergePick">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10"/><path d="m14 13-2-2-6 6"/><circle cx="9" cy="8" r="1.5"/><path d="M18 18v4M16 20h4"/></svg>
-              选择本地多张图片…
-            </button>
-            <div class="pickrow">
-              <button class="btn" id="mergeCanvas">从画布取图</button>
-            </div>
-            <div id="mergePicked" class="picklist"></div>
+        <div class="field-label">选择参考图（本地多选 / 画布内容，2-14 张）</div>
+        <button class="btn pickbtn" id="mergePick">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10"/><path d="m14 13-2-2-6 6"/><circle cx="9" cy="8" r="1.5"/><path d="M18 18v4M16 20h4"/></svg>
+          选择本地多张图片…
+        </button>
+        <div class="pickrow">
+          <button class="btn" id="mergeCanvas">从画布取图</button>
+        </div>
+        <div id="mergePicked" class="picklist"></div>
+        <div class="field-label">融合指令</div>
+        <textarea id="mergePrompt" placeholder="例：将参考图中的产品放入参考图的场景中，保持产品外观与场景光影一致"></textarea>
+        <div class="row">
+          <div>
+            <div class="field-label">尺寸档位</div>
+            <select id="mergeSize"><option value="1K">1K</option><option value="1.5K">1.5K</option><option value="2K" selected>2K</option></select>
           </div>
-          <div class="card">
-            <span class="field-label">融合指令</span>
-            <textarea id="mergePrompt" placeholder="例：将参考图中的产品放入参考图的场景中，保持产品外观与场景光影一致"></textarea>
-            <div class="fl"><span class="fl-label">尺寸档位</span><div class="ctl"><select id="mergeSize"><option value="1K">1K</option><option value="1.5K">1.5K</option><option value="2K" selected>2K</option></select></div></div>
-            <div class="fl"><span class="fl-label">模型</span><div class="ctl"><select id="mergeModel"><option value="doubao-seedream-4-5-251128" selected>Seedream 4.5</option></select></div></div>
+          <div>
+            <div class="field-label">模型</div>
+            <select id="mergeModel"><option value="doubao-seedream-4-5-251128" selected>Seedream 4.5</option></select>
           </div>
-          <div id="mergeBusy" class="busy"><div class="spin"></div>豆包正在融合图片…</div>
-          <div id="mergeResult"></div>
         </div>
         <div class="actions"><button class="btn primary" id="mergeRun">开始融合</button></div>
+        <div id="mergeBusy" class="busy"><div class="spin"></div>豆包正在融合图片…</div>
+        <div id="mergeResult"></div>
       </div>
 
       <!-- 翻译 -->
       <div class="view" id="view-translate">
-        <div class="vbody">
-          <div class="card">
-            <div class="tlbox">
-              <div class="fl"><span class="fl-label">文本图层</span><div class="ctl"><select id="trLayer" title="画布中的文本图层（kind=type）"></select></div><button class="btn" id="trLayerGet">取原文</button></div>
-              <div class="tlhint">选中文本图层后点「取原文」，文字内容一键填入原文框（未改名时=图层名）。</div>
-            </div>
+        <div class="tlbox">
+          <div class="field-label">文本图层联动（Photon 画布中的文字图层）</div>
+          <div class="tlrow">
+            <select id="trLayer" title="画布中的文本图层（kind=type）"></select>
+            <button class="btn small" id="trLayerGet">取原文</button>
           </div>
-          <div class="card">
-            <span class="field-label">原文（每行一段，可多行批量）</span>
-            <textarea id="trText" placeholder="每行一个图层/段落，翻译结果逐行对应"></textarea>
-            <div class="fl"><span class="fl-label">目标语言</span><div class="ctl"><select id="trTarget">
-              <option value="en">英语</option><option value="zh">中文</option><option value="ja">日语</option>
-              <option value="ko">韩语</option><option value="fr">法语</option><option value="de">德语</option>
-              <option value="es">西班牙语</option><option value="ru">俄语</option>
-            </select></div></div>
-            <div class="fl"><span class="fl-label">风格</span><div class="ctl"><select id="trStyle"><option value="通用" selected>通用</option><option value="电商营销">电商营销</option><option value="正式公文">正式公文</option><option value="口语化">口语化</option></select></div></div>
+          <div class="tlhint">选中文本图层后点「取原文」，文字内容一键填入原文框（未改名时=图层名）。</div>
+        </div>
+        <div class="field-label">原文（每行一段，可多行批量）</div>
+        <textarea id="trText" placeholder="每行一个图层/段落，翻译结果逐行对应"></textarea>
+        <div class="row">
+          <div>
+            <div class="field-label">目标语言</div>
+            <select id="trTarget">
+              <option value="en">英语</option>
+              <option value="zh">中文</option>
+              <option value="ja">日语</option>
+              <option value="ko">韩语</option>
+              <option value="fr">法语</option>
+              <option value="de">德语</option>
+              <option value="es">西班牙语</option>
+              <option value="ru">俄语</option>
+            </select>
           </div>
-          <div id="trBusy" class="busy"><div class="spin"></div>豆包正在翻译…</div>
-          <div id="trResult"></div>
+          <div>
+            <div class="field-label">风格</div>
+            <select id="trStyle"><option value="通用" selected>通用</option><option value="电商营销">电商营销</option><option value="正式公文">正式公文</option><option value="口语化">口语化</option></select>
+          </div>
         </div>
         <div class="actions"><button class="btn primary" id="trRun">翻译</button></div>
+        <div id="trBusy" class="busy"><div class="spin"></div>豆包正在翻译…</div>
+        <div id="trResult"></div>
       </div>
 
       <!-- 扩图 / 局部重绘 -->
       <div class="view" id="view-outpaint">
-        <div class="vbody">
-          <div class="card">
-            <div class="fl"><span class="fl-label">模式</span><div class="ctl"><select id="opMode"><option value="outpaint">智能扩图（扩展画幅）</option><option value="inpaint">局部重绘（按区域重绘）</option></select></div></div>
+        <div class="field-label">模式</div>
+        <select id="opMode">
+          <option value="outpaint">智能扩图（扩展画幅，保持主体）</option>
+          <option value="inpaint">局部重绘（按区域重绘）</option>
+        </select>
+        <div class="field-label">选择参考图（本地文件 / 画布内容）</div>
+        <button class="btn pickbtn" id="opPick">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10"/><path d="m14 13-2-2-6 6"/><circle cx="9" cy="8" r="1.5"/><path d="M18 18v4M16 20h4"/></svg>
+          选择本地图片…
+        </button>
+        <div class="pickrow">
+          <button class="btn" id="opCanvas">从画布取图</button>
+        </div>
+        <div id="opPicked"></div>
+        <div id="opRatioRow">
+          <div class="field-label">扩展目标比例</div>
+          <select id="opRatio">
+            <option value="16:9">16:9 横版</option>
+            <option value="9:16">9:16 竖版</option>
+            <option value="4:3">4:3</option>
+            <option value="3:4">3:4</option>
+            <option value="2:1">2:1 宽幅</option>
+            <option value="1:2">1:2 长幅</option>
+            <option value="1:1">1:1 方图</option>
+          </select>
+        </div>
+        <div id="opBboxRow" style="display:none">
+          <div class="field-label">重绘区域（像素坐标：left top right bottom）</div>
+          <div class="row" style="gap:5px">
+            <input type="text" id="opBboxL" placeholder="left">
+            <input type="text" id="opBboxT" placeholder="top">
+            <input type="text" id="opBboxR" placeholder="right">
+            <input type="text" id="opBboxB" placeholder="bottom">
           </div>
-          <div class="card">
-            <span class="field-label">选择参考图（本地文件 / 画布内容）</span>
-            <button class="btn pickbtn" id="opPick">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10"/><path d="m14 13-2-2-6 6"/><circle cx="9" cy="8" r="1.5"/><path d="M18 18v4M16 20h4"/></svg>
-              选择本地图片…
-            </button>
-            <div class="pickrow">
-              <button class="btn" id="opCanvas">从画布取图</button>
-            </div>
-            <div id="opPicked"></div>
-            <div id="opRatioRow">
-              <div class="fl" style="margin-top:4px"><span class="fl-label">目标比例</span><div class="ctl"><select id="opRatio">
-                <option value="16:9">16:9 横版</option><option value="9:16">9:16 竖版</option><option value="4:3">4:3</option>
-                <option value="3:4">3:4</option><option value="2:1">2:1 宽幅</option><option value="1:2">1:2 长幅</option>
-                <option value="1:1">1:1 方图</option>
-              </select></div></div>
-            </div>
-            <div id="opBboxRow" style="display:none">
-              <span class="field-label">重绘区域（像素坐标：left top right bottom）</span>
-              <div class="row" style="gap:4px">
-                <input type="text" id="opBboxL" placeholder="L">
-                <input type="text" id="opBboxT" placeholder="T">
-                <input type="text" id="opBboxR" placeholder="R">
-                <input type="text" id="opBboxB" placeholder="B">
-              </div>
-              <div class="pickrow"><button class="btn" id="opBboxSel">从画布选区获取</button></div>
-              <div class="hint">在 Photon 画布中用选区工具框选目标区域，再点「从画布选区获取」自动填入坐标；也可手动输入。</div>
-            </div>
+          <div class="pickrow"><button class="btn" id="opBboxSel">从画布选区获取</button></div>
+          <div class="hint">在 Photon 画布中用选区工具框选目标区域，再点「从画布选区获取」自动填入坐标；也可手动输入。</div>
+        </div>
+        <div class="field-label">指令（可选）</div>
+        <textarea id="opPrompt" placeholder="扩图：例：向左右两侧扩展画面，补充与现有环境光影一致的背景，主体保持不变。&#10;重绘：例：将框选区域中的产品外壳改为黑色皮革材质，其余保持原样"></textarea>
+        <div class="row">
+          <div>
+            <div class="field-label">尺寸档位</div>
+            <select id="opSize"><option value="1K">1K</option><option value="1.5K">1.5K</option><option value="2K" selected>2K</option></select>
           </div>
-          <div class="card">
-            <span class="field-label">指令（可选）</span>
-            <textarea id="opPrompt" placeholder="扩图：例：向左右两侧扩展画面，补充与现有环境光影一致的背景，主体保持不变。&#10;重绘：例：将框选区域中的产品外壳改为黑色皮革材质，其余保持原样"></textarea>
-            <div class="fl"><span class="fl-label">尺寸档位</span><div class="ctl"><select id="opSize"><option value="1K">1K</option><option value="1.5K">1.5K</option><option value="2K" selected>2K</option></select></div></div>
-            <div class="fl"><span class="fl-label">模型</span><div class="ctl"><select id="opModel"><option value="doubao-seedream-5-0-pro-260628" selected>Seedream 5.0 Pro</option><option value="doubao-seedream-5-0-flash-260628">Seedream 5.0 Flash</option></select></div></div>
+          <div>
+            <div class="field-label">模型</div>
+            <select id="opModel"><option value="doubao-seedream-5-0-pro-260628" selected>Seedream 5.0 Pro</option><option value="doubao-seedream-5-0-flash-260628">Seedream 5.0 Flash</option></select>
           </div>
-          <div id="opBusy" class="busy"><div class="spin"></div>豆包正在处理图片，约需 30-90 秒…</div>
-          <div id="opResult"></div>
         </div>
         <div class="actions"><button class="btn primary" id="opRun">开始处理</button></div>
+        <div id="opBusy" class="busy"><div class="spin"></div>豆包正在处理图片，约需 30-90 秒…</div>
+        <div id="opResult"></div>
       </div>
 
       <!-- 生成历史（图库） -->
       <div class="view" id="view-history">
-        <div class="vbody">
-          <div class="card">
-            <div class="labrow"><span class="field-label" style="flex:1;margin:0">生成图库（筛选 / 多选置入 / 导出）</span>
-              <button class="btn small ghost" id="histClear">清空</button>
-            </div>
-            <div id="histCats" class="genratio"></div>
-            <div id="histList"></div>
-            <div class="row histbar">
-              <label class="chk" style="margin:0"><input type="checkbox" id="histSelAll"><span>全选</span></label>
-              <span class="spacer"></span>
-              <button class="btn" id="histPlaceSel" disabled>批量置入（0）</button>
-            </div>
-            <div class="hint">历史仅保存在当前会话内，关闭面板后清空；需要长期保存请点条目上的「保存 PNG」。</div>
-          </div>
+        <div class="row" style="align-items:center;margin-bottom:8px">
+          <div class="field-label" style="margin:0;flex:1">生成图库（可筛选 / 多选批量置入 / 导出 PNG）</div>
+          <button class="btn small ghost" id="histClear">清空</button>
         </div>
+        <div id="histCats" class="genratio"></div>
+        <div id="histList"></div>
+        <div class="row histbar">
+          <label class="chk" style="margin:0"><input type="checkbox" id="histSelAll"><span>全选</span></label>
+          <span class="spacer"></span>
+          <button class="btn" id="histPlaceSel" disabled>批量置入（0）</button>
+        </div>
+        <div class="hint">历史仅保存在当前会话内，关闭面板后清空；需要长期保存请点条目上的「保存 PNG」。</div>
       </div>
     </div>
-  </div>
 
   <!-- 生成图预览弹层 -->
   <div id="histPreview" class="preset-panel hidden">
     <div class="sess-head">
-      <span style="font-size:var(--fs2);font-weight:600;color:var(--t1)">生成图预览</span>
+      <span style="font-size:var(--ph-text-sm);font-weight:600;color:var(--ph-text)">生成图预览</span>
       <span class="spacer"></span>
       <button class="btn small" id="histPrevClose">关闭</button>
     </div>
-    <div style="flex:1;min-height:0;overflow:auto;display:flex;align-items:center;justify-content:center;padding:16px">
-      <img id="histPrevImg" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--r)">
+    <div style="flex:1;min-height:0;overflow:auto;display:flex;align-items:center;justify-content:center">
+      <img id="histPrevImg" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--ph-radius-7)">
     </div>
+  </div>
   </div>
 
   <textarea id="showOps" readonly style="display:none;width:100%;height:140px;box-sizing:border-box;background:#0e1116;color:#9ad1ff;border:1px solid #2a2f3a;border-radius:6px;font:11px/1.4 Consolas,monospace;padding:8px;resize:vertical"></textarea>
@@ -586,31 +742,33 @@
   <!-- 提示词预设弹层 -->
   <div id="presetPanel" class="preset-panel hidden">
     <div class="sess-head">
-      <span style="font-size:var(--fs2);font-weight:600;color:var(--t1)">提示词预设（点击即注入当前输入框）</span>
+      <span style="font-size:var(--ph-text-sm);font-weight:600;color:var(--ph-text)">提示词预设（点击即注入当前输入框）</span>
       <span class="spacer"></span>
       <button class="btn small" id="presetClose">关闭</button>
     </div>
     <div id="presetList" class="sess-list"></div>
     <div class="preset-save">
       <input type="text" id="presetName" placeholder="预设名称，如：电商白底主图">
-      <button class="btn primary" id="presetSave">保存为预设</button>
+      <button class="btn primary" id="presetSave">保存当前输入为预设</button>
     </div>
   </div>
 
   <!-- 检查更新弹层 -->
   <div id="updPanel" class="preset-panel hidden">
     <div class="sess-head">
-      <span style="font-size:var(--fs2);font-weight:600;color:var(--t1)">检查更新</span>
+      <span style="font-size:var(--ph-text-sm);font-weight:600;color:var(--ph-text)">检查更新</span>
       <span class="spacer"></span>
       <button class="btn small" id="updClose">关闭</button>
     </div>
-    <div id="updBody" style="flex:1;min-height:0;overflow:auto;font-size:var(--fs2);color:var(--t2);line-height:1.6;padding:12px 16px"></div>
+    <div id="updBody" style="flex:1;min-height:0;overflow:auto;font-size:var(--ph-text-sm);color:var(--ph-soft);line-height:1.6"></div>
   </div>
 
-  <!-- ═══ 底部状态栏（32px） ═══ -->
   <div class="foot">
     <span id="footStatus">就绪</span>
-    <label title="置入画布后自动把豆包图层整理进「豆包生成」组"><input type="checkbox" id="autoGroup">置入自动分组</label>
+    <span class="spacer"></span>
+    <label title="置入画布后自动把豆包图层整理进「豆包生成」组" style="display:inline-flex;align-items:center;gap:5px;color:var(--ph-muted);font-size:var(--ph-text-meta);cursor:pointer;user-select:none;white-space:nowrap">
+      <input type="checkbox" id="autoGroup" style="accent-color:#fff;width:12px;height:12px;margin:0">置入自动分组
+    </label>
     <button id="opsBtn" class="btn small" title="列出 Photon 对插件开放的全部操作，用于排查">能力清单</button>
     <span id="docInfo"></span>
   </div>

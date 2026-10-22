@@ -1,5 +1,5 @@
 {
-  "version": "1.7.1",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.7.1.zip",
-  "note": "前端布局按 PS 原生面板规格重构：面板固定 480px 窄面板居中停靠；左侧导航 190px（选中项 2px 蓝紫渐变竖线 + 10% 主色填充）；顶部通栏 40px；卡片式分组（#1B1F2E · 8px 圆角 · 12px 内边距 · 16px 间距）；卡片内统一 80px 右对齐标签 + 控件占满布局（行高 32 / 行距 8）；主操作按钮通栏 42px 蓝紫渐变加粗；底部状态栏 32px + 1px 分割线；8px 栅格全界面统一。"
+  "version": "1.7.0",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.7.0.zip",
+  "note": "代码架构模块化重构：单体 panel.js 按功能拆分为 11 个独立模块（core/history/presets/chat/generate/edit/merge/translate/outpaint/update/boot），加载顺序清晰、更易维护扩展；所有功能与界面保持不变。"
 }
