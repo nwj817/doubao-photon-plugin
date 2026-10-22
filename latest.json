@@ -1,5 +1,5 @@
 {
-  "version": "1.6.1",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.6.1.zip",
-  "note": "更新：检查更新弹层新增「下载更新包」按钮，面板内一键保存最新安装包，无需复制链接；解压后双击安装脚本即完成覆盖更新。"
+  "version": "1.6.2",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.6.2.zip",
+  "note": "界面焕新：全新「霓虹玻璃」风格——深空蓝紫渐变背景、毛玻璃面板、青紫渐变发光按钮与选中态；所有功能与操作不变。"
 }

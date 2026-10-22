@@ -1389,7 +1389,7 @@
   }
 
   /* ---------- 检查更新（GitHub latest.json 对比） ---------- */
-  var PLUGIN_VERSION = "1.6.1";
+  var PLUGIN_VERSION = "1.6.2";
   var REPO = "nwj817/doubao-photon-plugin";
   // 更新信息多源探测：按顺序尝试，哪个可达用哪个（国内网络下 api.github.com 最稳，raw/CDN 兜底）
   var UPD_SOURCES = [
