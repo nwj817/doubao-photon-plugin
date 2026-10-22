@@ -1,5 +1,5 @@
 {
-  "version": "1.6.2",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.6.2.zip",
-  "note": "界面焕新：全新「霓虹玻璃」风格——深空蓝紫渐变背景、毛玻璃面板、青紫渐变发光按钮与选中态；所有功能与操作不变。"
+  "version": "1.7.0",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.7.0.zip",
+  "note": "代码架构模块化重构：单体 panel.js 按功能拆分为 11 个独立模块（core/history/presets/chat/generate/edit/merge/translate/outpaint/update/boot），加载顺序清晰、更易维护扩展；所有功能与界面保持不变。"
 }

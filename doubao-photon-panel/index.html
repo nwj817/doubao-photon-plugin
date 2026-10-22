@@ -773,6 +773,17 @@
     <span id="docInfo"></span>
   </div>
 </div>
-<script src="panel.js"></script>
+<!-- 模块化加载：core 先行，其余按依赖顺序，boot 最后启动 -->
+<script src="modules/core.js"></script>
+<script src="modules/history.js"></script>
+<script src="modules/presets.js"></script>
+<script src="modules/chat.js"></script>
+<script src="modules/generate.js"></script>
+<script src="modules/edit.js"></script>
+<script src="modules/merge.js"></script>
+<script src="modules/translate.js"></script>
+<script src="modules/outpaint.js"></script>
+<script src="modules/update.js"></script>
+<script src="modules/boot.js"></script>
 </body>
 </html>
