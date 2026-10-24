@@ -1,5 +1,5 @@
 {
-  "version": "1.7.0",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.7.0.zip",
-  "note": "代码架构模块化重构：单体 panel.js 按功能拆分为 11 个独立模块（core/history/presets/chat/generate/edit/merge/translate/outpaint/update/boot），加载顺序清晰、更易维护扩展；所有功能与界面保持不变。"
+  "version": "1.7.2",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.7.2.zip",
+  "note": "新增更新提示：自动检查发现新版本时，右上角弹出提示框（5 秒不点击自动消失），点击「查看」打开更新详情，可一键下载更新包。"
 }

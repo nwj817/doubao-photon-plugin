@@ -417,6 +417,27 @@
   .preset-panel.hidden{display:none;}
   .preset-save{display:flex;gap:7px;margin-top:8px;}
   .preset-save input{flex:1;min-width:0;}
+
+  /* ── 更新提示 Toast：发现新版本时弹出，5 秒不点击自动消失，点击查看详情 ── */
+  .upd-toast{
+    position:fixed;top:46px;right:14px;z-index:40;
+    display:flex;align-items:flex-start;gap:9px;max-width:300px;
+    background:var(--ph-panel-strong);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border:1px solid var(--ph-stroke-strong);border-radius:var(--ph-radius-11);
+    box-shadow:var(--ph-glow-white-strong);padding:11px 12px;
+    opacity:0;transform:translateY(-6px);
+    transition:opacity var(--ph-duration-hover) var(--ph-ease-out),transform var(--ph-duration-shadow) var(--ph-ease-out);
+    user-select:none;
+  }
+  .upd-toast.show{opacity:1;transform:translateY(0);}
+  .upd-toast .ut-ic{width:8px;height:8px;border-radius:50%;background:var(--ph-grad);flex:none;margin-top:5px;box-shadow:var(--ph-glow-accent-sm);}
+  .upd-toast-body{flex:1;min-width:0;}
+  .upd-toast-title{font-size:var(--ph-text-base);font-weight:var(--ph-weight-semibold);color:var(--ph-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .upd-toast-note{font-size:var(--ph-text-sm);color:var(--ph-muted);margin-top:3px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .upd-toast .btn{flex:none;}
+  .upd-toast .ut-close{background:transparent;box-shadow:none;color:var(--ph-soft);padding:0 6px;}
+  .upd-toast .ut-close:hover:not(:disabled){color:var(--ph-text);background:transparent;box-shadow:none;}
 </style>
 </head>
 <body>
@@ -761,6 +782,17 @@
       <button class="btn small" id="updClose">关闭</button>
     </div>
     <div id="updBody" style="flex:1;min-height:0;overflow:auto;font-size:var(--ph-text-sm);color:var(--ph-soft);line-height:1.6"></div>
+  </div>
+
+  <!-- 更新提示 Toast：自动检查发现新版本时弹出，5 秒不点击自动消失，点击查看更新详情 -->
+  <div id="updToast" class="upd-toast hidden">
+    <div class="ut-ic"></div>
+    <div class="upd-toast-body">
+      <div class="upd-toast-title" id="updToastTitle"></div>
+      <div class="upd-toast-note" id="updToastNote"></div>
+    </div>
+    <button class="btn small" id="updToastGo">查看</button>
+    <button class="btn small ut-close" id="updToastClose" title="关闭提示">×</button>
   </div>
 
   <div class="foot">

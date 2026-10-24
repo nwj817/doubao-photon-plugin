@@ -19,6 +19,51 @@
     DP.$("updPanel").classList.remove("hidden");
   }
 
+  /* 发现新版本详情 HTML（提示框「查看」与手动检查共用） */
+  var lastUpdateData = null;
+  function renderNewVersionHtml(data) {
+    var latest = data.version;
+    return (
+      '<div style="font-size:var(--ph-text-sm);margin-bottom:8px">发现新版本：<b style="color:var(--ph-accent);font-size:var(--ph-text-md)">v' + DP.esc(latest) + "</b>（当前 v" + DP.esc(DP.PLUGIN_VERSION) + "）</div>" +
+      (data.note ? '<div style="margin-bottom:10px;white-space:pre-wrap">' + DP.esc(data.note) + "</div>" : "") +
+      '<div style="margin-bottom:10px">更新步骤：点「下载更新包」保存 zip → 解压 → 退出 Photon → 双击「一键安装豆包插件.bat」→ 重启 Photon。</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+      '<button class="btn primary" data-act="dlzip" data-url="' + DP.escAttr(data.zip || "") + '">下载更新包</button>' +
+      '<button class="btn" data-act="copy" data-text="' + DP.escAttr(data.zip || ("https://raw.githubusercontent.com/" + REPO + "/main/latest.json")) + '">复制下载链接</button>' +
+      "</div>"
+    );
+  }
+
+  /* 更新提示 Toast：发现新版本弹出，5 秒不点击自动消失，点击「查看」打开更新详情 */
+  var toastTimer = null;
+  var toastShown = false;
+  function showUpdateToast(latest, note) {
+    var toast = DP.$("updToast");
+    if (!toast || toastShown) return;                 // 同一面板会话只弹一次
+    toastShown = true;
+    DP.$("updToastTitle").textContent = "发现新版本 v" + latest;
+    var brief = String(note || "").replace(/\s+/g, " ").trim();
+    var noteEl = DP.$("updToastNote");
+    noteEl.textContent = brief || ("当前 v" + DP.PLUGIN_VERSION + "，点击查看更新详情");
+    noteEl.style.display = brief ? "" : "none";
+    toast.classList.remove("hidden");
+    void toast.offsetWidth;                            // 强制重排，确保过渡动画生效
+    toast.classList.add("show");
+    console.log("[update] update-toast shown: v" + latest);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { hideUpdateToast(true); }, 5000);
+  }
+  function hideUpdateToast(autod) {
+    var toast = DP.$("updToast");
+    if (!toast) return;
+    clearTimeout(toastTimer);
+    toast.classList.remove("show");
+    setTimeout(function () {
+      if (!toast.classList.contains("show")) toast.classList.add("hidden");
+    }, 220);
+    if (autod) console.log("[update] update-toast auto-dismissed after 5s");
+  }
+
   function fetchUpdateInfo() {
     var chain = Promise.reject(new Error("no source"));
     UPD_SOURCES.forEach(function (src) {
@@ -53,16 +98,14 @@
         try { localStorage.setItem("doubao.updCheck", JSON.stringify({ t: Date.now(), v: DP.PLUGIN_VERSION })); } catch (e) { }
         if (!silent) renderUpdateInfo('<div class="hint" style="text-align:center;margin-top:16px">当前已是最新版本 <b style="color:var(--ph-text)">v' + DP.esc(DP.PLUGIN_VERSION) + "</b></div>");
       } else {
-        renderUpdateInfo(
-          '<div style="font-size:var(--ph-text-sm);margin-bottom:8px">发现新版本：<b style="color:var(--ph-accent);font-size:var(--ph-text)">v' + DP.esc(latest) + "</b>（当前 v" + DP.esc(DP.PLUGIN_VERSION) + "）</div>" +
-          (data.note ? '<div style="margin-bottom:10px;white-space:pre-wrap">' + DP.esc(data.note) + "</div>" : "") +
-          '<div style="margin-bottom:10px">更新步骤：点「下载更新包」保存 zip → 解压 → 退出 Photon → 双击「一键安装豆包插件.bat」→ 重启 Photon。</div>' +
-          '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
-          '<button class="btn primary" data-act="dlzip" data-url="' + DP.escAttr(data.zip || "") + '">下载更新包</button>' +
-          '<button class="btn" data-act="copy" data-text="' + DP.escAttr(data.zip || ("https://raw.githubusercontent.com/" + REPO + "/main/latest.json")) + '">复制下载链接</button>' +
-          '</div>'
-        );
-        if (silent) DP.setFoot("发现新版本 v" + latest + "，点「检查更新」查看");
+        lastUpdateData = data;
+        if (silent) {
+          /* 自动检查发现新版本：弹出提示框，5 秒不点击自动消失 */
+          showUpdateToast(String(latest), data.note);
+          DP.setFoot("发现新版本 v" + latest + "，点「检查更新」查看");
+        } else {
+          renderUpdateInfo(renderNewVersionHtml(data));
+        }
       }
     }).catch(function (e) {
       if (!silent) renderUpdateInfo("检查失败：" + DP.friendlyErr(e.message || String(e)) + "<br>当前网络可能无法访问 GitHub 更新源，请稍后重试，或直接访问仓库 <b>github.com/" + DP.esc(REPO) + "</b> 手动下载更新。");
@@ -130,5 +173,11 @@
   DP.registerInit(function () {
     DP.$("updBtn").addEventListener("click", function () { checkUpdate(false); });
     DP.$("updClose").addEventListener("click", function () { DP.$("updPanel").classList.add("hidden"); });
+    DP.$("updToastGo").addEventListener("click", function () {
+      hideUpdateToast(false);
+      if (lastUpdateData) renderUpdateInfo(renderNewVersionHtml(lastUpdateData));
+      else checkUpdate(false);
+    });
+    DP.$("updToastClose").addEventListener("click", function () { hideUpdateToast(false); });
   });
 })();
