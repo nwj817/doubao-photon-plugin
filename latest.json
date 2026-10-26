@@ -1,5 +1,5 @@
 {
-  "version": "1.8.8",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.8.zip",
-  "note": "自动更新再简化：不再让用户选文件夹，插件自动定位自己的安装目录，点「立即更新」下载解压后直接覆盖原版本文件，完成提示重启 Photon 即可。"
+  "version": "1.8.9",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.9.zip",
+  "note": "修复多图融合本地选图只能加一张的问题：宿主文件选择对话框不支持多选，改为「点一次加一张」追加模式，反复点按钮直到选够 2-14 张；画布取图同样是追加。"
 }

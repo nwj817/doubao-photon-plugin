@@ -23,11 +23,22 @@
         .catch(function (e) { DP.errInto("mergeResult", e.message || String(e)); })
         .finally(function () { DP.setBusy("mergeBusy", false); });
     });
+    /* SDK.files.pick 宿主只返回单个文件，故改为「点一次加一张」追加模式 */
     DP.$("mergePick").addEventListener("click", function () {
-      DP.pickImage(true).then(function (list) {
-        DP.state.merge = list || [];
+      var btn = this;
+      btn.disabled = true;
+      DP.pickImage(false).then(function (p) {
+        if (!p) return;
+        DP.state.merge = DP.state.merge || [];
+        if (DP.state.merge.length >= 14) {
+          DP.errInto("mergeResult", "最多 14 张参考图，请先移除多余的");
+          return;
+        }
+        DP.state.merge.push(p);
         DP.renderPicked("mergePicked", DP.state.merge);
-      }).catch(function (e) { DP.errInto("mergeResult", e.message || String(e)); });
+        DP.setFoot("已添加本地图片（" + DP.state.merge.length + " 张，可继续点按钮添加）");
+      }).catch(function (e) { DP.errInto("mergeResult", e.message || String(e)); })
+        .finally(function () { btn.disabled = false; });
     });
     DP.$("mergeCanvas").addEventListener("click", function () {
       DP.setFoot("正在导出画布…");
