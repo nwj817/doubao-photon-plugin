@@ -1,5 +1,5 @@
 {
-  "version": "1.8.5",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.5.zip",
-  "note": "更新体验重做：点「立即更新」插件自动下载并解压覆盖安装目录（首次选一次插件文件夹授权即可），无需再手动解压 zip、双击安装脚本；装完重启 Photon 生效。仍保留手动下载 zip 兜底。"
+  "version": "1.8.6",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.6.zip",
+  "note": "图生图「从画布取图」参考图名称去掉递增序号（之前显示 画布·Untitled-1 #15/#16 每次变化），现在固定显示 画布·文档名，简洁一致。"
 }

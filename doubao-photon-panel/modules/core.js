@@ -13,7 +13,7 @@
   DP.ARK_ORIGIN = "https://ark.cn-beijing.volces.com";
   DP.ARK_BASE = DP.ARK_ORIGIN + "/api/v3";
   DP.TEXT_MODEL = "doubao-seed-2-1-pro-260628";
-  DP.PLUGIN_VERSION = "1.8.5";                // 版本号集中管理（检查更新 / 打包命名）
+  DP.PLUGIN_VERSION = "1.8.6";                // 版本号集中管理（检查更新 / 打包命名）
   DP.autoGroupOn = false;                     // 默认关闭自动分组
   DP.state = {
     analyze: null,
@@ -294,7 +294,7 @@
         var b64 = uri.split(",")[1] || "";
         if (b64.length > 10 * 1024 * 1024) throw new Error("画布过大（超过 10MB），请缩小画布尺寸后重试");
         return {
-          path: "画布 · " + docName + " #" + DP.canvasSeq, mime: "image/png", b64: b64, uri: uri, docId: docId,
+          path: "画布 · " + docName, mime: "image/png", b64: b64, uri: uri, docId: docId,
           bounds: norm.bounds || null
         };
       });
