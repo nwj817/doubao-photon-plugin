@@ -438,6 +438,21 @@
   .upd-toast .btn{flex:none;}
   .upd-toast .ut-close{background:transparent;box-shadow:none;color:var(--ph-soft);padding:0 6px;}
   .upd-toast .ut-close:hover:not(:disabled){color:var(--ph-text);background:transparent;box-shadow:none;}
+
+  /* ── 仓库卡片（本地文件夹 / 云端 WebDAV） ── */
+  .repo-card{
+    background:var(--ph-panel-strong);border:1px solid var(--ph-stroke);
+    border-radius:var(--ph-radius-11);padding:10px 12px;margin-bottom:10px;
+    box-shadow:var(--ph-hairline);
+  }
+  .repo-head{display:flex;align-items:center;gap:8px;}
+  .repo-title{font-size:var(--ph-text-base);font-weight:var(--ph-weight-semibold);color:var(--ph-text);}
+  .repo-sub{font-size:var(--ph-text-meta);font-weight:var(--ph-weight-normal);color:var(--ph-soft);}
+  .repo-status{font-size:var(--ph-text-sm);color:var(--ph-muted);margin-top:7px;line-height:1.5;word-break:break-all;}
+  .repo-status.ok{color:var(--ph-accent);}
+  .repo-cloud-form{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+  .repo-cloud-form.hidden,.repo-card.hidden{display:none;}
+  .repo-cloud-form input{width:100%;box-sizing:border-box;}
 </style>
 </head>
 <body>
@@ -479,7 +494,7 @@
       </div>
       <div class="tab" data-view="history">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2.5"/></svg>
-        历史
+        仓库
       </div>
     </div>
 
@@ -728,9 +743,36 @@
         <div id="opResult"></div>
       </div>
 
-      <!-- 生成历史（图库） -->
+      <!-- 仓库：本地文件夹 + 云端 WebDAV 云盘 + 生成图库 -->
       <div class="view" id="view-history">
-        <div class="row" style="align-items:center;margin-bottom:8px">
+        <!-- 本地仓库 -->
+        <div class="repo-card" id="repoLocalCard">
+          <div class="repo-head">
+            <span class="repo-title">本地仓库</span>
+            <span class="spacer"></span>
+            <button class="btn small" id="repoLocalBtn">连接本地文件夹</button>
+          </div>
+          <div class="repo-status" id="repoLocalStatus">未连接 —— 连接后，新生成的图片自动归档到选定文件夹</div>
+        </div>
+        <!-- 云端仓库（WebDAV） -->
+        <div class="repo-card" id="repoCloudCard">
+          <div class="repo-head">
+            <span class="repo-title">云端仓库 <span class="repo-sub">（WebDAV：坚果云 / 群晖 / Nextcloud 等）</span></span>
+            <span class="spacer"></span>
+            <button class="btn small" id="repoCloudToggle">连接云盘</button>
+          </div>
+          <div class="repo-cloud-form hidden" id="repoCloudForm">
+            <input id="repoCloudUrl" placeholder="服务器地址，如 https://dav.jianguoyun.com/dav/" autocomplete="off">
+            <input id="repoCloudUser" placeholder="用户名 / 邮箱" autocomplete="off">
+            <input id="repoCloudPass" type="password" placeholder="密码 / 应用授权码" autocomplete="off">
+            <input id="repoCloudDir" placeholder="远程目录，如 /豆包/" autocomplete="off">
+            <div class="row">
+              <button class="btn small primary" id="repoCloudTest">测试连接并保存</button>
+            </div>
+          </div>
+          <div class="repo-status" id="repoCloudStatus">未连接 —— 在图库条目上点「云」上传单张图片</div>
+        </div>
+        <div class="row" style="align-items:center;margin:12px 0 8px">
           <div class="field-label" style="margin:0;flex:1">生成图库（可筛选 / 多选批量置入 / 导出 PNG）</div>
           <button class="btn small ghost" id="histClear">清空</button>
         </div>
@@ -808,6 +850,7 @@
 <!-- 模块化加载：core 先行，其余按依赖顺序，boot 最后启动 -->
 <script src="modules/core.js"></script>
 <script src="modules/history.js"></script>
+<script src="modules/repo.js"></script>
 <script src="modules/presets.js"></script>
 <script src="modules/chat.js"></script>
 <script src="modules/generate.js"></script>

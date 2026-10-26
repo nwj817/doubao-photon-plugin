@@ -96,6 +96,7 @@
         '<div style="font-size:var(--ph-text-sm);color:var(--ph-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px">' + DP.esc(it.time) +
         (it.prompt ? " · " + DP.esc(it.prompt.slice(0, 36)) : "") + "</div></div>" +
         '<button class="btn small" data-act="histSave" data-id="' + it.id + '" title="导出 PNG 到本地">保存 PNG</button>' +
+        '<button class="btn small" data-act="histCloud" data-id="' + it.id + '" title="上传到云端仓库（WebDAV）">云</button>' +
         '<button class="btn small primary" data-act="histPlace" data-id="' + it.id + '">置入</button></div>';
     }).join("");
     box.innerHTML = html;
