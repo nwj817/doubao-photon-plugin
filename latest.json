@@ -1,5 +1,5 @@
 {
-  "version": "1.8.7",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.7.zip",
-  "note": "多图融合优化：参考图卡片现在按取图顺序显示 #1 #2 ... #14 序号，一眼区分；「移除」按钮改为精确删除单张图（之前画布取图多张同名，点移除会误删全部同名参考图）。"
+  "version": "1.8.8",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.8.zip",
+  "note": "自动更新再简化：不再让用户选文件夹，插件自动定位自己的安装目录，点「立即更新」下载解压后直接覆盖原版本文件，完成提示重启 Photon 即可。"
 }

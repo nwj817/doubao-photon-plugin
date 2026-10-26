@@ -158,15 +158,28 @@
     return Promise.reject(new Error("不支持的 ZIP 压缩方式 method=" + e.method));
   }
 
-  /* 拿到插件安装目录授权（首次弹选择器，之后记住） */
+  /* 从面板自身加载 URL 自动反推插件安装目录，无需用户选文件夹 */
+  function detectPluginDir() {
+    try {
+      var u = location.href || "";
+      if (u.indexOf("file:///") === 0) {
+        var p = decodeURIComponent(u.slice(8));       // C:/Users/.../packages/key/sha/index.html
+        p = p.replace(/\//g, "\\").replace(/\\[^\\]*$/, "");  // 去掉 index.html，保留目录
+        if (p) return p;
+      }
+    } catch (e) { }
+    return null;
+  }
   function getInstallDir() {
-    var saved = null;
-    try { saved = localStorage.getItem("doubao.pluginDir"); } catch (e) { }
-    if (saved) return Promise.resolve(saved);
-    return DP.SDK.files.pick({ folder: true }).then(function (dir) {
-      if (!dir) throw new Error("已取消选择安装目录");
-      localStorage.setItem("doubao.pluginDir", dir);
-      return dir;
+    var dir = detectPluginDir();
+    if (dir) {
+      console.log("[update] auto-detected plugin dir:", dir);
+      return Promise.resolve(dir);
+    }
+    /* 极端兜底：无法从 URL 定位时才让用户选 */
+    return DP.SDK.files.pick({ folder: true }).then(function (d) {
+      if (!d) throw new Error("无法定位插件安装目录");
+      return d;
     });
   }
 
@@ -201,25 +214,36 @@
     });
   }
 
-  /* 自动更新主流程：下载 → 解压 → 覆盖写入安装目录 */
+  /* 自动更新主流程：下载 → 解压 → 自动覆盖当前插件目录（无需选文件夹） */
   function autoUpdate(url) {
     if (!url) { renderUpdateInfo("更新包地址为空"); return; }
     DP.setFoot("正在下载更新包…");
     downloadZipBytes(url).then(function (bytes) {
       DP.setFoot("正在解压并覆盖安装…");
       var entries = parseZipEntries(bytes);
-      var files = entries.filter(function (e) { return e.name && e.name.charAt(e.name.length - 1) !== "/"; });
-      if (!files.length) throw new Error("ZIP 内没有文件");
+      /* 只取插件目录内的文件；zip 顶层是 doubao-photon-panel/，剥掉前缀；
+         install_plugin.py / 一键安装.bat 是给手动安装用的，自动更新跳过 */
+      var files = entries.filter(function (e) {
+        if (!e.name || e.name.charAt(e.name.length - 1) === "/") return false;
+        return /^doubao-photon-panel\//.test(e.name);
+      }).map(function (e) {
+        return { rel: e.name.replace(/^doubao-photon-panel\//, ""), src: e };
+      });
+      if (!files.length) throw new Error("ZIP 内没有插件文件");
+      console.log("[update] files to overwrite:", files.map(function (f) { return f.rel; }));
       return getInstallDir().then(function (dir) {
         var i = 0, ok = 0;
         function writeNext() {
-          if (i >= files.length) {
-            return { dir: dir, count: ok };
-          }
-          var e = files[i++];
-          return extractEntry(bytes, e).then(function (content) {
-            return DP.SDK.files.write(dir + "/" + e.name, content);
-          }).then(function () { ok++; return writeNext(); });
+          if (i >= files.length) return { dir: dir, count: ok };
+          var f = files[i++];
+          return extractEntry(bytes, f.src).then(function (content) {
+            return DP.SDK.files.write(dir + "/" + f.rel, content);
+          }).then(function () { ok++; return writeNext(); })
+            .catch(function (we) {
+              /* 单文件失败不中断，记录后继续 */
+              console.warn("[update] write failed:", f.rel, we && we.message || we);
+              return writeNext();
+            });
         }
         return writeNext();
       });
@@ -228,10 +252,8 @@
       renderUpdateInfo(
         '<div style="padding:10px 4px">' +
         '<div style="color:var(--ph-accent);margin-bottom:8px">自动更新完成（覆盖 ' + res.count + " 个文件）</div>" +
-        '<div>安装目录：' + DP.esc(res.dir) + "</div>" +
         '<div style="margin-top:8px;color:var(--ph-muted)">请退出并重启 Photon Studio 后生效。</div></div>'
       );
-      try { localStorage.removeItem("doubao.pluginDir"); } catch (e) { }  // 不缓存授权，目录若变重新选
       DP.setFoot("更新完成，重启 Photon 后生效");
     }).catch(function (e) {
       DP.setFoot("自动更新失败");
