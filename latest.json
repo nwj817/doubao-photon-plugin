@@ -1,5 +1,5 @@
 {
-  "version": "1.8.2",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.2.zip",
-  "note": "翻译功能重做：改为纯本地中→英词典翻译，不联网、不消耗方舟额度；内置电商设计高频词（补光/摄影/直播/爆款/高清/磁吸等约 150 条），保留从画布文本图层取原文功能，译文一键复制。"
+  "version": "1.8.3",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.3.zip",
+  "note": "修复文生图尺寸选择故障：固定比例与自定义像素现在严格互斥——选自定义像素时固定比例面板完全隐藏（之前只是变暗仍可点击，导致两者同时生效）；选固定比例时自定义输入框隐藏。"
 }

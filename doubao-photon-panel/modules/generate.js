@@ -115,7 +115,8 @@
     document.querySelectorAll('input[name="genSizeMode"]').forEach(function (r) {
       r.addEventListener("change", function () {
         var custom = r.value === "custom" && r.checked;
-        DP.$("genFixed").classList.toggle("dim", custom);
+        /* 两面板同一时刻只显示一个：物理互斥，避免比例按钮与自定义输入同时可点 */
+        DP.$("genFixed").classList.toggle("hidden", custom);
         DP.$("genCustom").classList.toggle("hidden", !custom);
         updateGenSizeInfo();
       });
