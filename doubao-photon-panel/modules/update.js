@@ -1,6 +1,6 @@
 "use strict";
 
-/* ========= 模块：update —— 检查更新（多源探测 / 面板内一键下载更新包） ========= */
+/* ========= 模块：update —— 检查更新 + 面板内自动解压覆盖安装（无需手动解压/跑脚本） ========= */
 
 (function () {
   var DP = window.DP;
@@ -19,27 +19,27 @@
     DP.$("updPanel").classList.remove("hidden");
   }
 
-  /* 发现新版本详情 HTML（提示框「查看」与手动检查共用） */
+  /* 发现新版本详情 HTML */
   var lastUpdateData = null;
   function renderNewVersionHtml(data) {
     var latest = data.version;
     return (
       '<div style="font-size:var(--ph-text-sm);margin-bottom:8px">发现新版本：<b style="color:var(--ph-accent);font-size:var(--ph-text-md)">v' + DP.esc(latest) + "</b>（当前 v" + DP.esc(DP.PLUGIN_VERSION) + "）</div>" +
       (data.note ? '<div style="margin-bottom:10px;white-space:pre-wrap">' + DP.esc(data.note) + "</div>" : "") +
-      '<div style="margin-bottom:10px">更新步骤：点「下载更新包」保存 zip → 解压 → 退出 Photon → 双击「一键安装豆包插件.bat」→ 重启 Photon。</div>' +
+      '<div style="margin-bottom:10px">点「立即更新」自动下载并覆盖安装，完成后重启 Photon 即可。</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
-      '<button class="btn primary" data-act="dlzip" data-url="' + DP.escAttr(data.zip || "") + '">下载更新包</button>' +
-      '<button class="btn" data-act="copy" data-text="' + DP.escAttr(data.zip || ("https://raw.githubusercontent.com/" + REPO + "/main/latest.json")) + '">复制下载链接</button>' +
+      '<button class="btn primary" data-act="autoupd" data-url="' + DP.escAttr(data.zip || "") + '">立即更新</button>' +
+      '<button class="btn" data-act="dlzip" data-url="' + DP.escAttr(data.zip || "") + '">手动下载 zip</button>' +
       "</div>"
     );
   }
 
-  /* 更新提示 Toast：发现新版本弹出，5 秒不点击自动消失，点击「查看」打开更新详情 */
+  /* 更新提示 Toast：发现新版本弹出，5 秒不点击自动消失 */
   var toastTimer = null;
   var toastShown = false;
   function showUpdateToast(latest, note) {
     var toast = DP.$("updToast");
-    if (!toast || toastShown) return;                 // 同一面板会话只弹一次
+    if (!toast || toastShown) return;
     toastShown = true;
     DP.$("updToastTitle").textContent = "发现新版本 v" + latest;
     var brief = String(note || "").replace(/\s+/g, " ").trim();
@@ -47,7 +47,7 @@
     noteEl.textContent = brief || ("当前 v" + DP.PLUGIN_VERSION + "，点击查看更新详情");
     noteEl.style.display = brief ? "" : "none";
     toast.classList.remove("hidden");
-    void toast.offsetWidth;                            // 强制重排，确保过渡动画生效
+    void toast.offsetWidth;
     toast.classList.add("show");
     console.log("[update] update-toast shown: v" + latest);
     clearTimeout(toastTimer);
@@ -83,7 +83,8 @@
   }
 
   function checkUpdate(silent) {
-    if (!DP.SDK || !DP.SDK.network || typeof DP.SDK.network.request !== "function") {      if (!silent) renderUpdateInfo("当前环境不支持网络请求（SDK.network 不可用）");
+    if (!DP.SDK || !DP.SDK.network || typeof DP.SDK.network.request !== "function") {
+      if (!silent) renderUpdateInfo("当前环境不支持网络请求（SDK.network 不可用）");
       return;
     }
     if (silent) {
@@ -100,7 +101,6 @@
       } else {
         lastUpdateData = data;
         if (silent) {
-          /* 自动检查发现新版本：弹出提示框，5 秒不点击自动消失 */
           showUpdateToast(String(latest), data.note);
           DP.setFoot("发现新版本 v" + latest + "，点「检查更新」查看");
         } else {
@@ -112,6 +112,65 @@
     });
   }
 
+  /* ---------- ZIP 解压（浏览器原生 DecompressionStream） ---------- */
+  function utf8decode(view) { return new TextDecoder("utf-8").decode(view); }
+
+  /* 解析 ZIP central directory，返回条目列表 */
+  function parseZipEntries(bytes) {
+    var dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    var eocd = -1;
+    var min = Math.max(0, bytes.length - 65557);
+    for (var i = bytes.length - 22; i >= min; i--) {
+      if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    }
+    if (eocd < 0) throw new Error("不是有效的 ZIP 包");
+    var cdCount = dv.getUint16(eocd + 10, true);
+    var cdOffset = dv.getUint32(eocd + 16, true);
+    var entries = [], p = cdOffset;
+    for (var n = 0; n < cdCount; n++) {
+      if (dv.getUint32(p, true) !== 0x02014b50) break;
+      entries.push({
+        name: utf8decode(bytes.subarray(p + 46, p + 46 + dv.getUint16(p + 28, true))),
+        method: dv.getUint16(p + 10, true),
+        compSize: dv.getUint32(p + 20, true),
+        localOff: dv.getUint32(p + 42, true)
+      });
+      p += 46 + dv.getUint16(p + 28, true) + dv.getUint16(p + 30, true) + dv.getUint16(p + 32, true);
+    }
+    return entries;
+  }
+
+  /* 解压单个条目（method 0=stored, 8=deflate-raw） */
+  function extractEntry(bytes, e) {
+    var dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    var lNameLen = dv.getUint16(e.localOff + 26, true);
+    var lExtraLen = dv.getUint16(e.localOff + 28, true);
+    var start = e.localOff + 30 + lNameLen + lExtraLen;
+    var comp = bytes.subarray(start, start + e.compSize);
+    if (e.method === 0) return Promise.resolve(comp);
+    if (e.method === 8) {
+      if (typeof DecompressionStream === "undefined") {
+        return Promise.reject(new Error("当前 Photon 版本不支持在线解压（DecompressionStream 缺失），请用手动下载方式"));
+      }
+      return new Response(new Blob([comp]).stream().pipeThrough(new DecompressionStream("deflate-raw")))
+        .arrayBuffer().then(function (ab) { return new Uint8Array(ab); });
+    }
+    return Promise.reject(new Error("不支持的 ZIP 压缩方式 method=" + e.method));
+  }
+
+  /* 拿到插件安装目录授权（首次弹选择器，之后记住） */
+  function getInstallDir() {
+    var saved = null;
+    try { saved = localStorage.getItem("doubao.pluginDir"); } catch (e) { }
+    if (saved) return Promise.resolve(saved);
+    return DP.SDK.files.pick({ folder: true }).then(function (dir) {
+      if (!dir) throw new Error("已取消选择安装目录");
+      localStorage.setItem("doubao.pluginDir", dir);
+      return dir;
+    });
+  }
+
+  /* 下载 zip bytes（优先 api base64，兜底直链） */
   function str2bin(s) {
     var n = s.length, u = new Uint8Array(n);
     for (var i = 0; i < n; i++) u[i] = s.charCodeAt(i) & 0xff;
@@ -121,53 +180,94 @@
     var m = /\/releases\/[^\/?#]+\.zip/i.exec(url || "");
     return m ? m[0].replace(/^\//, "") : "";
   }
-  function saveZipBlob(bytes, url) {
-    var blob = new Blob([bytes], { type: "application/zip" });
-    var name = "doubao-photon-panel-v" + DP.PLUGIN_VERSION + ".zip";
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = name;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 30000);
-    renderUpdateInfo("下载已开始：保存 <b>" + DP.esc(name) + "</b> → 解压 → 退出 Photon → 双击「一键安装豆包插件.bat」→ 重启 Photon 即完成更新。");
-  }
-  function downloadZip(url) {
-    if (!url) { renderUpdateInfo("更新包地址为空，请点「复制下载链接」手动下载"); return; }
-    if (!DP.SDK || !DP.SDK.network || typeof DP.SDK.network.request !== "function") {
-      renderUpdateInfo("当前环境不支持网络下载，请点「复制下载链接」在浏览器中打开下载"); return;
-    }
-    DP.setFoot("正在下载更新包…");
+  function downloadZipBytes(url) {
     var apiUrl = "https://api.github.com/repos/" + REPO + "/contents/" + zipPathFromUrl(url);
-    DP.SDK.network.request({ method: "GET", url: apiUrl }).then(function (r) {
+    return DP.SDK.network.request({ method: "GET", url: apiUrl }).then(function (r) {
       if (r && r.body && typeof r.body.content === "string") {
-        var bytes = str2bin(atob(r.body.content));
-        if (bytes && bytes.length >= 5000) { saveZipBlob(bytes, url); return; }
+        var b = str2bin(atob(r.body.content));
+        if (b && b.length >= 5000) return b;
       }
       throw new Error("api binary unavailable");
     }).catch(function () {
       return DP.SDK.network.request({ method: "GET", url: url }).then(function (r) {
         var body = r && r.body !== undefined ? r.body : (r && r.data !== undefined ? r.data : null);
-        if (body === null || body === undefined) throw new Error("empty response");
         var bytes = null;
         if (typeof body === "string") bytes = str2bin(body);
         else if (body instanceof ArrayBuffer) bytes = new Uint8Array(body);
         else if (body && body.buffer) bytes = new Uint8Array(body.buffer);
         if (!bytes || bytes.length < 5000) throw new Error("bad bytes");
-        saveZipBlob(bytes, url);
-      }).catch(function (e2) {
-        DP.setFoot("面板内保存不可用，已为你复制下载链接");
-        renderUpdateInfo("当前环境无法直接保存文件，已自动复制下载链接，粘贴到浏览器打开即可下载。");
-        navigator.clipboard.writeText(url).catch(function () { });
+        return bytes;
       });
     });
   }
 
+  /* 自动更新主流程：下载 → 解压 → 覆盖写入安装目录 */
+  function autoUpdate(url) {
+    if (!url) { renderUpdateInfo("更新包地址为空"); return; }
+    DP.setFoot("正在下载更新包…");
+    downloadZipBytes(url).then(function (bytes) {
+      DP.setFoot("正在解压并覆盖安装…");
+      var entries = parseZipEntries(bytes);
+      var files = entries.filter(function (e) { return e.name && e.name.charAt(e.name.length - 1) !== "/"; });
+      if (!files.length) throw new Error("ZIP 内没有文件");
+      return getInstallDir().then(function (dir) {
+        var i = 0, ok = 0;
+        function writeNext() {
+          if (i >= files.length) {
+            return { dir: dir, count: ok };
+          }
+          var e = files[i++];
+          return extractEntry(bytes, e).then(function (content) {
+            return DP.SDK.files.write(dir + "/" + e.name, content);
+          }).then(function () { ok++; return writeNext(); });
+        }
+        return writeNext();
+      });
+    }).then(function (res) {
+      console.log("[update] auto-update done:", res);
+      renderUpdateInfo(
+        '<div style="padding:10px 4px">' +
+        '<div style="color:var(--ph-accent);margin-bottom:8px">自动更新完成（覆盖 ' + res.count + " 个文件）</div>" +
+        '<div>安装目录：' + DP.esc(res.dir) + "</div>" +
+        '<div style="margin-top:8px;color:var(--ph-muted)">请退出并重启 Photon Studio 后生效。</div></div>'
+      );
+      try { localStorage.removeItem("doubao.pluginDir"); } catch (e) { }  // 不缓存授权，目录若变重新选
+      DP.setFoot("更新完成，重启 Photon 后生效");
+    }).catch(function (e) {
+      DP.setFoot("自动更新失败");
+      renderUpdateInfo(
+        "自动更新失败：" + DP.friendlyErr(e.message || String(e)) +
+        '<br>兜底方案：点「手动下载 zip」，解压后双击「一键安装豆包插件.bat」。'
+      );
+    });
+  }
+
+  /* 手动下载兜底（保存 zip 到用户选定位置） */
+  function saveZipBlob(bytes, url) {
+    return DP.SDK.files.pick({ save: true, name: "doubao-photon-panel.zip" }).then(function (path) {
+      if (!path) { renderUpdateInfo("已取消保存"); return; }
+      return DP.SDK.files.write(path, bytes).then(function () {
+        renderUpdateInfo("已保存到：<b>" + DP.esc(path) + "</b><br>解压后双击「一键安装豆包插件.bat」即可。");
+      });
+    }).catch(function (e) {
+      renderUpdateInfo("保存失败：" + (e && e.message || e) + "，已复制下载链接到剪贴板。");
+      navigator.clipboard.writeText(url).catch(function () { });
+    });
+  }
+  function manualDownload(url) {
+    if (!url) { renderUpdateInfo("更新包地址为空"); return; }
+    DP.setFoot("正在下载更新包…");
+    downloadZipBytes(url).then(function (bytes) {
+      return saveZipBlob(bytes, url);
+    }).catch(function (e) {
+      renderUpdateInfo("下载失败：" + DP.friendlyErr(e.message || String(e)) + "，已复制链接。");
+      navigator.clipboard.writeText(url).catch(function () { });
+    });
+  }
+
   /* 更新动作（data-act 委托） */
-  DP.registerAction("dlzip", function (btn) {
-    downloadZip(btn.dataset.url || "");
-  });
+  DP.registerAction("autoupd", function (btn) { autoUpdate(btn.dataset.url || ""); });
+  DP.registerAction("dlzip", function (btn) { manualDownload(btn.dataset.url || ""); });
   DP.checkUpdate = checkUpdate;
 
   DP.registerInit(function () {
