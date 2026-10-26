@@ -433,7 +433,7 @@
   .upd-toast.show{opacity:1;transform:translateY(0);}
   .upd-toast .ut-ic{width:8px;height:8px;border-radius:50%;background:var(--ph-grad);flex:none;margin-top:5px;box-shadow:var(--ph-glow-accent-sm);}
   .upd-toast-body{flex:1;min-width:0;}
-  .upd-toast-title{font-size:var(--ph-text-base);font-weight:var(--ph-weight-semibold);color:var(--ph-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .upd-toast-title{font-size:var(--ph-text-base);font-weight:600;color:var(--ph-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .upd-toast-note{font-size:var(--ph-text-sm);color:var(--ph-muted);margin-top:3px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   .upd-toast .btn{flex:none;}
   .upd-toast .ut-close{background:transparent;box-shadow:none;color:var(--ph-soft);padding:0 6px;}
@@ -476,6 +476,10 @@
       <div class="tab" data-view="outpaint">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4"/></svg>
         扩图重绘
+      </div>
+      <div class="tab" data-view="slice">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        切片导出
       </div>
       <div class="tab" data-view="history">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2.5"/></svg>
@@ -728,6 +732,26 @@
         <div id="opResult"></div>
       </div>
 
+      <!-- 切片导出 -->
+      <div class="view" id="view-slice">
+        <div class="tlbox">
+          <div class="field-label">参考线切片导出（绕开整页导出尺寸限制）</div>
+          <div class="tlhint">
+            使用方法：<br>
+            1. 在 Photon 画布中用<b>水平参考线</b>把详情页切成多段<br>
+            2. 点「预览切片」确认切分数量和每段高度<br>
+            3. 点「开始导出」选择文件夹，自动逐段导出 JPEG<br><br>
+            原理：每段切片单独截取导出，不会触发整页 8192px 缩小限制，导出原始尺寸。
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="slicePreview">预览切片</button>
+          <button class="btn primary" id="sliceRun">开始导出切片</button>
+        </div>
+        <div id="sliceInfo" style="margin-top:12px;white-space:pre-wrap;font:11px/1.5 var(--ph-font-mono);color:var(--ph-muted);background:var(--ph-sunken);border-radius:8px;padding:10px;max-height:200px;overflow:auto"></div>
+        <div class="hint" style="margin-top:8px">导出文件名格式：文档名_切片N_高度px.jpg</div>
+      </div>
+
       <!-- 生成历史（图库） -->
       <div class="view" id="view-history">
         <div class="row" style="align-items:center;margin-bottom:8px">
@@ -815,6 +839,7 @@
 <script src="modules/merge.js"></script>
 <script src="modules/translate.js"></script>
 <script src="modules/outpaint.js"></script>
+<script src="modules/slice-export.js"></script>
 <script src="modules/update.js"></script>
 <script src="modules/boot.js"></script>
 </body>
