@@ -433,7 +433,7 @@
   .upd-toast.show{opacity:1;transform:translateY(0);}
   .upd-toast .ut-ic{width:8px;height:8px;border-radius:50%;background:var(--ph-grad);flex:none;margin-top:5px;box-shadow:var(--ph-glow-accent-sm);}
   .upd-toast-body{flex:1;min-width:0;}
-  .upd-toast-title{font-size:var(--ph-text-base);font-weight:600;color:var(--ph-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .upd-toast-title{font-size:var(--ph-text-base);font-weight:var(--ph-weight-semibold);color:var(--ph-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .upd-toast-note{font-size:var(--ph-text-sm);color:var(--ph-muted);margin-top:3px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   .upd-toast .btn{flex:none;}
   .upd-toast .ut-close{background:transparent;box-shadow:none;color:var(--ph-soft);padding:0 6px;}
@@ -749,10 +749,9 @@
         <div class="repo-card" id="repoLocalCard">
           <div class="repo-head">
             <span class="repo-title">本地仓库</span>
-            <span class="spacer"></span>
-            <button class="btn small" id="repoLocalBtn">连接本地文件夹</button>
           </div>
           <div class="repo-status" id="repoLocalStatus">未连接 —— 连接后，新生成的图片自动归档到选定文件夹</div>
+          <button class="btn" id="repoLocalBtn" style="width:100%;box-sizing:border-box;margin-top:9px">连接本地文件夹</button>
         </div>
         <!-- 云端仓库（WebDAV） -->
         <div class="repo-card" id="repoCloudCard">

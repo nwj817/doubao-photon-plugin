@@ -54,11 +54,13 @@
     return writeLocalFile(local.path + "/" + name, bytes).then(function () {
       console.log("[repo] local archived:", name);
       return name;
+    }).catch(function (e) {
+      onLocalWriteFail(e);
+      throw e;
     });
   }
 
-  /* 连接本地文件夹：files.pick 的目录模式参数名未公开，按候选依次探测，
-     命中"文件夹路径"（非图片文件路径）即成功；全部失败则友好报错并日志 */
+  /* 连接本地文件夹：SDK.files.pick({folder:true}) 弹系统"选择文件夹"对话框（宿主已确认参数） */
   function connectLocal() {
     if (!DP.SDK || !DP.SDK.files || !DP.SDK.files.pick) {
       DP.setFoot("SDK 文件能力不可用，请重启 Photon");
@@ -67,24 +69,8 @@
     var btn = DP.$("repoLocalBtn");
     btn.disabled = true;
     DP.setFoot("请在系统对话框中选择一个文件夹作为本地仓库…");
-    var attempts = [
-      { dir: true }, { directory: true }, { chooseFolder: true }, { folder: true }
-    ];
-    function tryNext(i) {
-      if (i >= attempts.length) {
-        console.log("[repo] pick candidates exhausted:", attempts);
-        return Promise.reject(new Error("插件平台暂不支持选择文件夹（已记录日志，请反馈作者）"));
-      }
-      return DP.SDK.files.pick(attempts[i]).then(function (p) {
-        console.log("[repo] pick(" + JSON.stringify(attempts[i]) + ") →", p);
-        if (p && !/\.(png|jpe?g|webp|gif)$/i.test(String(p))) return p;  // 拿到文件路径=参数未生效，换下一个
-        return tryNext(i + 1);
-      }).catch(function (e) {
-        console.log("[repo] pick candidate failed:", attempts[i], e && e.message);
-        return tryNext(i + 1);
-      });
-    }
-    tryNext(0).then(function (p) {
+    DP.SDK.files.pick({ folder: true }).then(function (p) {
+      if (!p) { DP.setFoot("已取消选择文件夹"); return; }
       local.path = p;
       localStorage.setItem(LS_LOCAL, p);
       refreshLocalUI();
@@ -92,6 +78,15 @@
     }).catch(function (e) {
       DP.setFoot("本地仓库连接失败：" + (e.message || e));
     }).finally(function () { btn.disabled = false; });
+  }
+
+  /* 授权失效（重启 Photon 后内存授权丢失）时自动断开，避免静默失败 */
+  function onLocalWriteFail(e) {
+    console.log("[repo] local write failed, disconnecting:", e && e.message);
+    local.path = "";
+    localStorage.removeItem(LS_LOCAL);
+    refreshLocalUI();
+    DP.setFoot("本地仓库授权已失效，请重新连接文件夹");
   }
 
   function disconnectLocal() {

@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.0.zip",
-  "note": "侧边「历史」升级为「仓库」：① 本地仓库——连接任意本地文件夹，新生成图片自动归档写入；② 云端仓库——支持 WebDAV 协议连接坚果云/群晖/Nextcloud 等任意兼容云盘，图库条目一键上传。生成图库功能保留不变。"
+  "version": "1.8.1",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.1.zip",
+  "note": "修复本地仓库连接：文件夹选择对话框参数修正（之前连环弹窗、无法选中文件夹），现在一次弹出正确的「选择文件夹」对话框；连接按钮加大为通栏按钮，更好点按；授权失效时自动提示重新连接。"
 }
