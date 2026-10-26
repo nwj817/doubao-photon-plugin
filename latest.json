@@ -1,5 +1,5 @@
 {
-  "version": "1.8.3",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.3.zip",
-  "note": "修复文生图尺寸选择故障：固定比例与自定义像素现在严格互斥——选自定义像素时固定比例面板完全隐藏（之前只是变暗仍可点击，导致两者同时生效）；选固定比例时自定义输入框隐藏。"
+  "version": "1.8.4",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.4.zip",
+  "note": "修复图生图两个故障：①置入画布的图层名现在自动带时分秒时间戳，多次置入不再出现重复同名图层；②「选图 / 从画布取图」按钮加并发锁，导出过程中禁用，防止连续点击重复导出、状态错乱。"
 }

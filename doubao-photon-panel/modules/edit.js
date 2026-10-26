@@ -75,14 +75,20 @@
         .finally(function () { DP.setBusy("editRevBusy", false); });
     });
 
-    /* 图生图：选图 / 画布取图 / 移除联动（data-rm 由 boot 统一处理） */
+    /* 图生图：选图 / 画布取图 / 移除联动（data-rm 由 boot 统一处理）。
+       取图加锁：导出中禁用按钮，防止连续点击重复 capture / 状态错乱 */
     DP.$("editPick").addEventListener("click", function () {
+      var btn = this;
+      btn.disabled = true;
       DP.pickImage(false).then(function (p) {
         DP.state.edit = p ? [p] : [];
         DP.renderPicked("editPicked", p);
-      }).catch(function (e) { DP.errInto("editResult", e.message || String(e)); });
+      }).catch(function (e) { DP.errInto("editResult", e.message || String(e)); })
+        .finally(function () { btn.disabled = false; });
     });
     DP.$("editCanvas").addEventListener("click", function () {
+      var btn = this;
+      btn.disabled = true;
       DP.setFoot("正在导出画布…");
       DP.canvasToRef().then(function (p) {
         DP.state.edit = p ? [p] : [];
@@ -91,7 +97,7 @@
       }).catch(function (e) {
         DP.errInto("editResult", e.message || String(e));
         DP.setFoot("从画布取图失败");
-      });
+      }).finally(function () { btn.disabled = false; });
     });
 
     DP.$("editModel").addEventListener("change", DP.updateEditTransparentState);

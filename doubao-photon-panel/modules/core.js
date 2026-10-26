@@ -13,7 +13,7 @@
   DP.ARK_ORIGIN = "https://ark.cn-beijing.volces.com";
   DP.ARK_BASE = DP.ARK_ORIGIN + "/api/v3";
   DP.TEXT_MODEL = "doubao-seed-2-1-pro-260628";
-  DP.PLUGIN_VERSION = "1.8.3";                // 版本号集中管理（检查更新 / 打包命名）
+  DP.PLUGIN_VERSION = "1.8.4";                // 版本号集中管理（检查更新 / 打包命名）
   DP.autoGroupOn = false;                     // 默认关闭自动分组
   DP.state = {
     analyze: null,
@@ -340,10 +340,16 @@
   };
 
   /* ---------- 图片结果面板 ---------- */
+  DP._layerStamp = function () {
+    var d = new Date(), p = function (n) { return (n < 10 ? "0" : "") + n; };
+    return p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds());
+  };
   DP.imageResult = function (container, url, bytes, label) {
     var b64 = DP.bytesToBase64(bytes);
+    /* 图层名带时分秒，避免多次置入同名图层 */
+    var uniqueLabel = (label || "豆包生成") + " " + DP._layerStamp();
     var html = '<div class="result"><div class="imgbox"><img src="' + DP.dataURI("image/png", b64) + '"></div>' +
-      '<div class="meta">' + DP.esc(label || "豆包生成") + " · " + bytes.length + " 字节 · <a href='" + DP.escAttr(url) + "' target='_blank' rel='noopener'>原图链接</a></div>" +
+      '<div class="meta">' + DP.esc(uniqueLabel) + " · " + bytes.length + " 字节 · <a href='" + DP.escAttr(url) + "' target='_blank' rel='noopener'>原图链接</a></div>" +
       '<div class="rbtns">' +
       '<button class="btn primary" data-act="place">置入画布</button>' +
       '<button class="btn" data-act="save">保存到本地</button>' +
@@ -351,8 +357,8 @@
       "</div></div>";
     var box = DP.$(container);
     box.innerHTML = html;
-    box.__label = label || "豆包生成";
-    return { url: url, bytes: bytes, label: box.__label };
+    box.__label = uniqueLabel;
+    return { url: url, bytes: bytes, label: uniqueLabel };
   };
 
   /* ---------- 置入画布（先智能对象，再等比缩放，不拉伸） ---------- */
