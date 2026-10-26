@@ -13,7 +13,7 @@
   DP.ARK_ORIGIN = "https://ark.cn-beijing.volces.com";
   DP.ARK_BASE = DP.ARK_ORIGIN + "/api/v3";
   DP.TEXT_MODEL = "doubao-seed-2-1-pro-260628";
-  DP.PLUGIN_VERSION = "1.8.6";                // 版本号集中管理（检查更新 / 打包命名）
+  DP.PLUGIN_VERSION = "1.8.7";                // 版本号集中管理（检查更新 / 打包命名）
   DP.autoGroupOn = false;                     // 默认关闭自动分组
   DP.state = {
     analyze: null,
@@ -328,14 +328,15 @@
   DP.renderPicked = function (container, picked) {
     var box = DP.$(container);
     if (!picked) { box.innerHTML = ""; return; }
+    /* data-rm 用 容器名:索引 定位，避免同名 path 误删多张 */
     if (Array.isArray(picked)) {
-      box.innerHTML = picked.map(function (p) {
-        return '<div class="picked"><img src="' + p.uri + '"><div class="pname">' + DP.esc(p.path) +
-          '</div><button class="btn small" data-rm="' + DP.escAttr(p.path) + '">移除</button></div>';
+      box.innerHTML = picked.map(function (p, i) {
+        return '<div class="picked"><img src="' + p.uri + '"><div class="pname">#' + (i + 1) + " " + DP.esc(p.path) +
+          '</div><button class="btn small" data-rm="' + container + ":" + i + '">移除</button></div>';
       }).join("");
     } else {
-      box.innerHTML = '<div class="picked"><img src="' + picked.uri + '"><div class="pname">' + DP.esc(picked.path) +
-        '</div><button class="btn small" data-rm="' + DP.escAttr(picked.path) + '">移除</button></div>';
+      box.innerHTML = '<div class="picked"><img src="' + picked.uri + '"><div class="pname">#' + DP.esc(picked.path) +
+        '</div><button class="btn small" data-rm="' + container + ':0">移除</button></div>';
     }
   };
 

@@ -3,7 +3,7 @@
   "sdkVersion": 1,
   "id": "doubao.creative",
   "name": "豆包 AI 创作",
-  "version": "1.8.6",
+  "version": "1.8.7",
   "main": "index.html",
   "panels": [
     {

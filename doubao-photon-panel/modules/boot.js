@@ -107,15 +107,16 @@
       }
     });
 
-    /* 移除已选图片（data-rm） */
+    /* 移除已选图片（data-rm = 容器名:索引，只删单张） */
     document.addEventListener("click", function (ev) {
       var btn = ev.target.closest ? ev.target.closest("button[data-rm]") : null;
       if (!btn) return;
-      var path = btn.dataset.rm;
-      if (DP.state.edit && DP.state.edit[0] && DP.state.edit[0].path === path) { DP.state.edit = []; DP.$("editPicked").innerHTML = ""; }
-      if (DP.state.op && DP.state.op.path === path) { DP.state.op = null; DP.$("opPicked").innerHTML = ""; }
-      if (DP.state.merge) {
-        DP.state.merge = DP.state.merge.filter(function (p) { return p.path !== path; });
+      var parts = String(btn.dataset.rm || "").split(":");
+      var c = parts[0], idx = parseInt(parts[1] || "0", 10) || 0;
+      if (c === "editPicked") { DP.state.edit = []; DP.$("editPicked").innerHTML = ""; }
+      else if (c === "opPicked") { DP.state.op = null; DP.$("opPicked").innerHTML = ""; }
+      else if (c === "mergePicked" && DP.state.merge) {
+        DP.state.merge.splice(idx, 1);
         DP.renderPicked("mergePicked", DP.state.merge);
       }
     });

@@ -1,5 +1,5 @@
 {
-  "version": "1.8.6",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.6.zip",
-  "note": "图生图「从画布取图」参考图名称去掉递增序号（之前显示 画布·Untitled-1 #15/#16 每次变化），现在固定显示 画布·文档名，简洁一致。"
+  "version": "1.8.7",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.7.zip",
+  "note": "多图融合优化：参考图卡片现在按取图顺序显示 #1 #2 ... #14 序号，一眼区分；「移除」按钮改为精确删除单张图（之前画布取图多张同名，点移除会误删全部同名参考图）。"
 }
