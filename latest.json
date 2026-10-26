@@ -1,5 +1,5 @@
 {
-  "version": "1.8.1",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.1.zip",
-  "note": "修复本地仓库连接：文件夹选择对话框参数修正（之前连环弹窗、无法选中文件夹），现在一次弹出正确的「选择文件夹」对话框；连接按钮加大为通栏按钮，更好点按；授权失效时自动提示重新连接。"
+  "version": "1.8.2",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.2.zip",
+  "note": "翻译功能重做：改为纯本地中→英词典翻译，不联网、不消耗方舟额度；内置电商设计高频词（补光/摄影/直播/爆款/高清/磁吸等约 150 条），保留从画布文本图层取原文功能，译文一键复制。"
 }
