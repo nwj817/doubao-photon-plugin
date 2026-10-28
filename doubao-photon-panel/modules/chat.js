@@ -239,10 +239,10 @@
     DP.setFoot("已移除附件图片");
   });
   DP.registerAction("chatToGen", function (btn) {
-    DP.$("genPrompt").value = btn.dataset.text || "";
-    var gtab = document.querySelector('.tab[data-view="generate"]');
+    DP.$("crPrompt").value = btn.dataset.text || "";
+    var gtab = document.querySelector('.tab[data-view="create"]');
     if (gtab) gtab.click();
-    DP.setFoot("已把回复填入文生图，可修改后生成");
+    DP.setFoot("已把回复填入 AI 创作，可修改后生成");
   });
   DP.registerAction("chatPlace", function (btn) {
     var cm = DP.state.chat[parseInt(btn.dataset.idx, 10)];

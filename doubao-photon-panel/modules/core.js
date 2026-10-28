@@ -13,11 +13,11 @@
   DP.ARK_ORIGIN = "https://ark.cn-beijing.volces.com";
   DP.ARK_BASE = DP.ARK_ORIGIN + "/api/v3";
   DP.TEXT_MODEL = "doubao-seed-2-1-pro-260628";
-  DP.PLUGIN_VERSION = "1.8.9";                // 版本号集中管理（检查更新 / 打包命名）
+  DP.PLUGIN_VERSION = "1.9.0";                // 版本号集中管理（检查更新 / 打包命名）
   DP.autoGroupOn = false;                     // 默认关闭自动分组
   DP.state = {
     analyze: null,
-    edit: [],
+    create: [],
     merge: [],
     op: null,          // 扩图/重绘 参考图
     history: [],       // 生成历史（会话内）

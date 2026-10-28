@@ -1,5 +1,5 @@
 {
-  "version": "1.8.9",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.8.9.zip",
-  "note": "修复多图融合本地选图只能加一张的问题：宿主文件选择对话框不支持多选，改为「点一次加一张」追加模式，反复点按钮直到选够 2-14 张；画布取图同样是追加。"
+  "version": "1.9.0",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.9.0.zip",
+  "note": "文生图与图生图合并为「AI 创作」：不添加参考图 = 文生图，添加参考图自动切换为图生图（可选透明背景、可反推提示词填入本页）；尺寸支持固定比例/自定义像素二选一，移除参考图即回到文生图。"
 }

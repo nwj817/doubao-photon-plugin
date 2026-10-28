@@ -3,7 +3,7 @@
   "sdkVersion": 1,
   "id": "doubao.creative",
   "name": "豆包 AI 创作",
-  "version": "1.8.9",
+  "version": "1.9.0",
   "main": "index.html",
   "panels": [
     {
@@ -23,20 +23,12 @@
       "keywords": ["豆包", "doubao", "AI", "生图", "翻译", "创作"]
     },
     {
-      "id": "open.generate",
-      "label": "豆包：文生图",
+      "id": "open.create",
+      "label": "豆包：AI 创作（文生图 / 图生图）",
       "scope": "document",
       "panel": "main",
       "menu": "Plugins",
-      "keywords": ["豆包", "生图", "AI 绘图", "生成图片"]
-    },
-    {
-      "id": "open.edit",
-      "label": "豆包：图生图 / 编辑",
-      "scope": "document",
-      "panel": "main",
-      "menu": "Plugins",
-      "keywords": ["豆包", "改图", "图生图", "编辑图片"]
+      "keywords": ["豆包", "生图", "AI 绘图", "生成图片", "改图", "图生图", "编辑图片"]
     },
     {
       "id": "open.merge",

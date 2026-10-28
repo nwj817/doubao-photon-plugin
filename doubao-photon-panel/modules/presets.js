@@ -1,14 +1,13 @@
 "use strict";
 
 /* ========= 模块：presets —— 自定义提示词预设（保存 + 一键注入） =========
-   服务对象：文生图 genPrompt / 图生图 editPrompt 两个输入框           */
+   服务对象：AI 创作页 crPrompt 输入框           */
 
 (function () {
   var DP = window.DP;
   if (!DP) throw new Error("core 未加载");
 
   var promptPresets = [];
-  var presetSource = "gen";   // 预设弹层当前服务的输入框：gen → genPrompt，edit → editPrompt
 
   DP.loadPromptPresets = function () {
     try {
@@ -20,13 +19,10 @@
   DP.savePromptPresets = function () {
     try { localStorage.setItem("doubao.promptPresets", JSON.stringify(promptPresets.slice(0, 30))); } catch (e) {}
   };
-  DP.presetTarget = function () {
-    return presetSource === "edit" ? DP.$("editPrompt") : DP.$("genPrompt");
-  };
-  DP.presetSource = function () { return presetSource; };
+  DP.presetTarget = function () { return DP.$("crPrompt"); };
+  DP.presetSource = function () { return "create"; };
 
-  function openPresetPanel(src) {
-    presetSource = src;
+  function openPresetPanel() {
     renderPresetList();
     DP.$("presetPanel").classList.remove("hidden");
   }
@@ -63,8 +59,7 @@
   });
 
   DP.registerInit(function () {
-    DP.$("genPreset").addEventListener("click", function () { openPresetPanel("gen"); });
-    DP.$("editPreset").addEventListener("click", function () { openPresetPanel("edit"); });
+    DP.$("crPreset").addEventListener("click", function () { openPresetPanel(); });
     DP.$("presetClose").addEventListener("click", function () { DP.$("presetPanel").classList.add("hidden"); });
     DP.$("presetSave").addEventListener("click", function () {
       var t = DP.presetTarget().value.trim();
