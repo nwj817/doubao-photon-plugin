@@ -200,6 +200,7 @@
   }
   input[type=text],select{min-height:32px;padding:0 10px;}
   textarea{min-height:72px;padding:8px 10px;resize:vertical;line-height:1.5;}
+  #crPrompt{min-height:140px;}
   textarea.small{min-height:44px;}
   input[type=text]:focus,textarea:focus{
     background:rgba(10,15,34,0.75);
@@ -555,11 +556,7 @@
         <div id="crReverseOut"></div>
         <div class="labrow"><span class="field-label" style="margin:0">画面描述 / 编辑指令</span><span class="spacer"></span><button class="btn small ghost" id="crPreset">提示词预设</button></div>
         <textarea id="crPrompt" placeholder="无参考图：描述画面（例：白色磁吸补光灯悬浮在深色背景中，C4D超写实渲染，产品居中，柔和环形光效）。有参考图：写编辑指令（例：背景改为浅灰渐变，保留产品光影与透视，外壳改为黑色皮革材质）"></textarea>
-        <div class="field-label">尺寸方式（二选一）</div>
-        <div class="sizemode">
-          <label class="sizemode-opt"><input type="radio" name="crSizeMode" value="fixed" checked><span>固定比例</span></label>
-          <label class="sizemode-opt"><input type="radio" name="crSizeMode" value="custom"><span>自定义像素</span></label>
-        </div>
+        <div class="field-label">尺寸</div>
         <div id="crFixed">
           <div class="genratio" id="crRatio">
             <span class="ratio on" data-ratio="1:1">1:1</span>
@@ -581,19 +578,6 @@
               <input type="text" id="crSizePx" readonly placeholder="选比例与档位后显示">
             </div>
           </div>
-        </div>
-        <div id="crCustom" class="hidden">
-          <div class="row">
-            <div>
-              <div class="field-label">宽度 px</div>
-              <input type="number" id="crW" min="1" placeholder="如 1024">
-            </div>
-            <div>
-              <div class="field-label">高度 px</div>
-              <input type="number" id="crH" min="1" placeholder="如 1024">
-            </div>
-          </div>
-          <div id="crSizeHint" class="hint"></div>
         </div>
         <div class="row">
           <div>

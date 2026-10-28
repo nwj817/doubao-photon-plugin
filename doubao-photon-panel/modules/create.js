@@ -53,11 +53,6 @@
   }
   function updateCrSizeInfo() {
     var model = DP.$("crModel").value;
-    var lim = crSizeLimits(model);
-    var hint = DP.$("crSizeHint");
-    if (hint) {
-      hint.textContent = "模型限制：总像素 " + lim.minPx.toLocaleString() + " ~ " + lim.maxPx.toLocaleString() + "，宽高比 1:16 ~ 16:1（生成时自动校验）";
-    }
     var pxEl = DP.$("crSizePx");
     if (pxEl) {
       var ratioEl = document.querySelector(".genratio .ratio.on");
@@ -66,35 +61,12 @@
     }
   }
   function crSizeValue() {
-    var mode = "fixed";
-    var radio = document.querySelector('input[name="crSizeMode"]:checked');
-    if (radio) mode = radio.value;
     var model = DP.$("crModel").value;
-    var lim = crSizeLimits(model);
-    if (mode === "fixed") {
-      var ratioEl = document.querySelector(".genratio .ratio.on");
-      var ratio = ratioEl ? ratioEl.dataset.ratio : "1:1";
-      var px = crRatioPx(model, DP.$("crSize").value, ratio);
-      if (!px) { DP.errInto("crResult", "该档位暂不支持所选比例，请更换档位或比例"); return null; }
-      return px;
-    }
-    var w = parseInt(DP.$("crW").value, 10), h = parseInt(DP.$("crH").value, 10);
-    if (!w || !h || w <= 0 || h <= 0) { DP.errInto("crResult", "请输入有效的像素宽高（正整数）"); return null; }
-    var total = w * h;
-    var r = w / h;
-    if (total < lim.minPx) {
-      DP.errInto("crResult", "总像素不足：当前 " + total.toLocaleString() + " px，该模型最低需 " + lim.minPx.toLocaleString() + " px（例如 1280x720）");
-      return null;
-    }
-    if (total > lim.maxPx) {
-      DP.errInto("crResult", "总像素超出：当前 " + total.toLocaleString() + " px，该模型上限 " + lim.maxPx.toLocaleString() + " px，请减小宽或高");
-      return null;
-    }
-    if (r < 1 / 16 || r > 16) {
-      DP.errInto("crResult", "宽高比超出模型限制（1:16 ~ 16:1），当前为 1:" + (r < 1 ? (1 / r).toFixed(1) : r.toFixed(1)));
-      return null;
-    }
-    return w + "x" + h;
+    var ratioEl = document.querySelector(".genratio .ratio.on");
+    var ratio = ratioEl ? ratioEl.dataset.ratio : "1:1";
+    var px = crRatioPx(model, DP.$("crSize").value, ratio);
+    if (!px) { DP.errInto("crResult", "该档位暂不支持所选比例，请更换档位或比例"); return null; }
+    return px;
   }
 
   /* ---------- 模式切换：无参考图 = 文生图；有参考图 = 图生图 ---------- */
@@ -161,7 +133,7 @@
     DP.$("crReverse").addEventListener("click", function () {
       if (!DP.state.create || !DP.state.create[0]) { DP.errInto("crReverseOut", "请先选择一张参考图（本地或画布）"); return; }
       DP.clearErr("crReverseOut"); DP.setBusy("crRevBusy", true);
-      var q = "分析这张参考图，反推可用于生成类似效果的结构化提示词：主体/材质/光影/构图/风格/色彩。输出英文+中文对照，直接给出提示词，不要解释。";
+      var q = "分析这张参考图，反推用于生成类似效果的中文提示词：把正向提示词与负向提示词合并成一段完整描述（包含主体/材质/光影/构图/风格/色彩，以及需要避免的瑕疵与负面要素）。只输出合并后的中文提示词，不要输出英文，不要解释。";
       var content = [
         { type: "text", text: q },
         { type: "image_url", image_url: { url: DP.state.create[0].uri } }
@@ -207,15 +179,7 @@
       }).finally(function () { btn.disabled = false; });
     });
 
-    /* ---------- 尺寸互斥 + 模型切换 ---------- */
-    document.querySelectorAll('input[name="crSizeMode"]').forEach(function (r) {
-      r.addEventListener("change", function () {
-        var custom = r.value === "custom" && r.checked;
-        DP.$("crFixed").classList.toggle("hidden", custom);
-        DP.$("crCustom").classList.toggle("hidden", !custom);
-        updateCrSizeInfo();
-      });
-    });
+    /* ---------- 尺寸 + 模型切换 ---------- */
     document.querySelectorAll(".genratio .ratio").forEach(function (b) {
       b.addEventListener("click", function () {
         document.querySelectorAll(".genratio .ratio").forEach(function (x) { x.classList.remove("on"); });

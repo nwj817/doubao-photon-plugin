@@ -1,5 +1,5 @@
 {
-  "version": "1.9.0",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.9.0.zip",
-  "note": "文生图与图生图合并为「AI 创作」：不添加参考图 = 文生图，添加参考图自动切换为图生图（可选透明背景、可反推提示词填入本页）；尺寸支持固定比例/自定义像素二选一，移除参考图即回到文生图。"
+  "version": "1.9.1",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.9.1.zip",
+  "note": "AI 创作页优化：反推提示词改为只输出中文、正负提示词合并为一段；提示词输入框增高；删除自定义像素，仅保留固定比例尺寸。"
 }
