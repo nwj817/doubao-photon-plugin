@@ -387,6 +387,10 @@
   .sizemode{display:flex;gap:14px;margin-bottom:8px;}
   .sizemode-opt{display:flex;align-items:center;gap:5px;font-size:var(--ph-text-sm);color:var(--ph-text);cursor:pointer;user-select:none;}
   .sizemode-opt input{accent-color:var(--ph-accent2);}
+  .opmode{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+  .opmode-card{background:var(--ph-panel);border:1px solid var(--ph-stroke);border-radius:8px;color:var(--ph-text);padding:9px 0;font-size:var(--ph-text-md);cursor:pointer;text-align:center;transition:border-color .15s,background .15s;}
+  .opmode-card:hover{border-color:var(--ph-accent2);}
+  .opmode-card.on{background:linear-gradient(135deg,rgba(114,120,255,.22),rgba(168,85,247,.22));border-color:var(--ph-accent2);color:#fff;font-weight:600;}
   .genratio{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
   .ratio{
     font-size:var(--ph-text-sm);color:var(--ph-soft);
@@ -488,7 +492,7 @@
       </div>
       <div class="tab" data-view="outpaint">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4"/></svg>
-        扩图重绘
+        智能编辑
       </div>
       <div class="tab" data-view="history">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2.5"/></svg>
@@ -637,13 +641,15 @@
         <div id="trResult"></div>
       </div>
 
-      <!-- 扩图 / 局部重绘 -->
+      <!-- 智能编辑：擦除 / 标记改图 / 扩图 / 变清晰 -->
       <div class="view" id="view-outpaint">
-        <div class="field-label">模式</div>
-        <select id="opMode">
-          <option value="outpaint">智能扩图（扩展画幅，保持主体）</option>
-          <option value="inpaint">局部重绘（按区域重绘）</option>
-        </select>
+        <div class="field-label">编辑模式</div>
+        <div class="opmode" id="opMode">
+          <button class="opmode-card on" data-opmode="erase">擦除</button>
+          <button class="opmode-card" data-opmode="inpaint">标记改图</button>
+          <button class="opmode-card" data-opmode="outpaint">扩图</button>
+          <button class="opmode-card" data-opmode="enhance">变清晰</button>
+        </div>
         <div class="field-label">选择参考图（本地文件 / 画布内容）</div>
         <button class="btn pickbtn" id="opPick">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10"/><path d="m14 13-2-2-6 6"/><circle cx="9" cy="8" r="1.5"/><path d="M18 18v4M16 20h4"/></svg>
@@ -653,7 +659,18 @@
           <button class="btn" id="opCanvas">从画布取图</button>
         </div>
         <div id="opPicked"></div>
-        <div id="opRatioRow">
+        <div id="opRegionRow">
+          <div class="field-label">目标区域（像素坐标：left top right bottom）</div>
+          <div class="row" style="gap:5px">
+            <input type="text" id="opBboxL" placeholder="left">
+            <input type="text" id="opBboxT" placeholder="top">
+            <input type="text" id="opBboxR" placeholder="right">
+            <input type="text" id="opBboxB" placeholder="bottom">
+          </div>
+          <div class="pickrow"><button class="btn" id="opBboxSel">从画布选区获取</button></div>
+          <div class="hint">在 Photon 画布中用选区工具框选目标区域，再点「从画布选区获取」自动填入坐标；也可手动输入。</div>
+        </div>
+        <div id="opRatioRow" style="display:none">
           <div class="field-label">扩展目标比例</div>
           <select id="opRatio">
             <option value="16:9">16:9 横版</option>
@@ -665,19 +682,11 @@
             <option value="1:1">1:1 方图</option>
           </select>
         </div>
-        <div id="opBboxRow" style="display:none">
-          <div class="field-label">重绘区域（像素坐标：left top right bottom）</div>
-          <div class="row" style="gap:5px">
-            <input type="text" id="opBboxL" placeholder="left">
-            <input type="text" id="opBboxT" placeholder="top">
-            <input type="text" id="opBboxR" placeholder="right">
-            <input type="text" id="opBboxB" placeholder="bottom">
-          </div>
-          <div class="pickrow"><button class="btn" id="opBboxSel">从画布选区获取</button></div>
-          <div class="hint">在 Photon 画布中用选区工具框选目标区域，再点「从画布选区获取」自动填入坐标；也可手动输入。</div>
+        <div id="opPromptWrap">
+          <div class="field-label">指令</div>
+          <textarea id="opPrompt" placeholder="标记改图：例：将框选区域中的产品外壳改为黑色皮革材质，其余保持原样。&#10;扩图：例：向左右两侧扩展画面，补充与现有环境光影一致的背景，主体保持不变。&#10;变清晰：例：去除噪点，提升锐度与细节（可不填，使用默认增强）"></textarea>
         </div>
-        <div class="field-label">指令（可选）</div>
-        <textarea id="opPrompt" placeholder="扩图：例：向左右两侧扩展画面，补充与现有环境光影一致的背景，主体保持不变。&#10;重绘：例：将框选区域中的产品外壳改为黑色皮革材质，其余保持原样"></textarea>
+        <div id="opEnhanceHint" class="hint hidden">不填写指令时，默认执行画质增强：去噪、去压缩伪影、提升清晰度与细节锐度、改善光影层次。</div>
         <div class="row">
           <div>
             <div class="field-label">尺寸档位</div>

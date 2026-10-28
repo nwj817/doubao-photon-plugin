@@ -1,5 +1,5 @@
 {
-  "version": "1.9.1",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.9.1.zip",
-  "note": "AI 创作页优化：反推提示词改为只输出中文、正负提示词合并为一段；提示词输入框增高；删除自定义像素，仅保留固定比例尺寸。"
+  "version": "1.9.2",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.9.2.zip",
+  "note": "扩图重绘重做为「智能编辑」：擦除（框选即擦除，零输入）/ 标记改图（框选+指令重绘）/ 扩图（扩展画幅）/ 变清晰（画质增强，暂用增强重绘实现），统一取图-选模式-生成流程，选区坐标自动带入。"
 }
