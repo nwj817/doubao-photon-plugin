@@ -482,10 +482,6 @@
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-4.5-4.5L5 21"/><path d="M17 3v4M15 5h4"/></svg>
         AI 创作
       </div>
-      <div class="tab" data-view="merge">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 8 4.5-8 4.5-8-4.5L12 2z"/><path d="m4 12.5 8 4.5 8-4.5"/><path d="m4 17 8 4.5 8-4.5"/></svg>
-        多图融合
-      </div>
       <div class="tab" data-view="translate">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h10M9 3v2M6 3c0 6-2 9-2 9M4 8h6"/><path d="m10 12-1.2 2M12 17c3-3 6-6 9-9M12 17c-1 0-2-.5-3-1"/><path d="m14.5 14 4.5 7M17 16l2 5"/></svg>
         翻译
@@ -497,6 +493,10 @@
       <div class="tab" data-view="history">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2.5"/></svg>
         仓库
+      </div>
+      <div class="tab" data-view="workflow">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>
+        工作流
       </div>
     </div>
 
@@ -538,29 +538,30 @@
         </div>
       </div>
 
-      <!-- AI 创作（文生图 + 图生图合并：无参考图 = 文生图，有参考图 = 图生图） -->
+      <!-- AI 创作（文生图 / 图生图 / 多图融合：0 张 = 文生图，1 张 = 图生图，≥2 张 = 融合） -->
       <div class="view" id="view-create">
         <div class="modebar">
           <span id="crModeTag" class="chip mode on">文生图</span>
           <span id="crModeTag2" class="chip mode">图生图</span>
+          <span id="crModeTag3" class="chip mode">多图融合</span>
           <span class="spacer"></span>
           <span id="crModeHint" class="mode-hint"></span>
         </div>
-        <div class="field-label">参考图（可选：不添加 = 文生图；添加后自动切换为图生图）</div>
+        <div class="field-label">参考图（0 张 = 文生图；1 张 = 图生图；2-14 张 = 多图融合）</div>
         <button class="btn pickbtn" id="crPick">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10"/><path d="m14 13-2-2-6 6"/><circle cx="9" cy="8" r="1.5"/><path d="M18 18v4M16 20h4"/></svg>
-          选择本地图片…
+          添加本地图片（点一次加一张，可重复点）…
         </button>
         <div class="pickrow">
           <button class="btn" id="crCanvas">从画布取图</button>
           <button class="btn" id="crReverse">反推提示词</button>
         </div>
-        <div id="crPicked"></div>
+        <div id="crPicked" class="picklist"></div>
         <div id="crRevBusy" class="busy"><div class="spin"></div>豆包正在分析参考图并反推提示词…</div>
         <div id="crReverseOut"></div>
-        <div class="labrow"><span class="field-label" style="margin:0">画面描述 / 编辑指令</span><span class="spacer"></span><button class="btn small ghost" id="crPreset">提示词预设</button></div>
+        <div class="labrow"><span class="field-label" style="margin:0" id="crPromptLabel">画面描述</span><span class="spacer"></span><button class="btn small ghost" id="crPreset">提示词预设</button></div>
         <textarea id="crPrompt" placeholder="无参考图：描述画面（例：白色磁吸补光灯悬浮在深色背景中，C4D超写实渲染，产品居中，柔和环形光效）。有参考图：写编辑指令（例：背景改为浅灰渐变，保留产品光影与透视，外壳改为黑色皮革材质）"></textarea>
-        <div class="field-label">尺寸</div>
+        <div class="field-label" id="crSizeLabel">尺寸</div>
         <div id="crFixed">
           <div class="genratio" id="crRatio">
             <span class="ratio on" data-ratio="1:1">1:1</span>
@@ -583,7 +584,20 @@
             </div>
           </div>
         </div>
-        <div class="row">
+        <div id="crMergeRow" class="hidden">
+          <div class="row">
+            <div>
+              <div class="field-label">融合尺寸档位</div>
+              <select id="crMergeSize"><option value="1K">1K</option><option value="1.5K">1.5K</option><option value="2K" selected>2K</option></select>
+            </div>
+            <div>
+              <div class="field-label">融合模型</div>
+              <select id="crMergeModel"><option value="doubao-seedream-4-5-251128" selected>Seedream 4.5</option></select>
+            </div>
+          </div>
+          <div class="hint">多图融合使用 Seedream 4.5，融合指令必填，如「将参考图中的产品放入参考图的场景中」。</div>
+        </div>
+        <div class="row" id="crModelRow">
           <div>
             <div class="field-label">模型</div>
             <select id="crModel"><option value="doubao-seedream-5-0-pro-260628" selected>Seedream 5.0 Pro</option><option value="doubao-seedream-4-5-251128">Seedream 4.5</option></select>
@@ -593,34 +607,6 @@
         <div class="actions"><button class="btn primary" id="crRun">生成图片</button></div>
         <div id="crBusy" class="busy"><div class="spin"></div>豆包正在生成图片，约需 30-90 秒…</div>
         <div id="crResult"></div>
-      </div>
-
-      <!-- 多图融合 -->
-      <div class="view" id="view-merge">
-        <div class="field-label">选择参考图（本地多选 / 画布内容，2-14 张）</div>
-        <button class="btn pickbtn" id="mergePick">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10"/><path d="m14 13-2-2-6 6"/><circle cx="9" cy="8" r="1.5"/><path d="M18 18v4M16 20h4"/></svg>
-          添加本地图片（点一次加一张，可重复点）…
-        </button>
-        <div class="pickrow">
-          <button class="btn" id="mergeCanvas">从画布取图</button>
-        </div>
-        <div id="mergePicked" class="picklist"></div>
-        <div class="field-label">融合指令</div>
-        <textarea id="mergePrompt" placeholder="例：将参考图中的产品放入参考图的场景中，保持产品外观与场景光影一致"></textarea>
-        <div class="row">
-          <div>
-            <div class="field-label">尺寸档位</div>
-            <select id="mergeSize"><option value="1K">1K</option><option value="1.5K">1.5K</option><option value="2K" selected>2K</option></select>
-          </div>
-          <div>
-            <div class="field-label">模型</div>
-            <select id="mergeModel"><option value="doubao-seedream-4-5-251128" selected>Seedream 4.5</option></select>
-          </div>
-        </div>
-        <div class="actions"><button class="btn primary" id="mergeRun">开始融合</button></div>
-        <div id="mergeBusy" class="busy"><div class="spin"></div>豆包正在融合图片…</div>
-        <div id="mergeResult"></div>
       </div>
 
       <!-- 翻译 -->
@@ -743,6 +729,66 @@
         </div>
         <div class="hint">历史仅保存在当前会话内，关闭面板后清空；需要长期保存请点条目上的「保存 PNG」。</div>
       </div>
+
+      <!-- 工作流：纯本地批处理，零 AI 消耗 -->
+      <div class="view" id="view-workflow">
+        <!-- 工作流 1：文件夹批量等比缩放 · 覆盖原图 -->
+        <div class="tlbox">
+          <div class="field-label">① 批量等比缩放 · 覆盖原图</div>
+          <div class="tlhint">选文件夹自动扫描图片（JPG / PNG / WebP）→ 按目标尺寸等比缩放（长边适配、不拉伸）→ 覆盖原文件。全程本地处理，不消耗 AI 额度。</div>
+          <div class="pickrow" style="margin-top:9px">
+            <button class="btn" id="wf1Scan">选择文件夹并扫描</button>
+            <button class="btn" id="wf1AddOne" title="宿主不支持文件夹扫描时的备选：逐张选择图片加入列表">逐张添加</button>
+          </div>
+          <div class="repo-status" id="wf1Meta"></div>
+          <div class="row" style="margin-top:10px">
+            <div>
+              <div class="field-label">目标宽度</div>
+              <input type="text" id="wf1W" placeholder="如 1000" inputmode="numeric">
+            </div>
+            <div>
+              <div class="field-label">目标高度</div>
+              <input type="text" id="wf1H" placeholder="如 1000" inputmode="numeric">
+            </div>
+          </div>
+          <div class="field-label">输出格式</div>
+          <div class="genratio" id="wf1Fmt">
+            <span class="ratio on" data-fmt="jpg">JPG</span>
+            <span class="ratio" data-fmt="png">PNG</span>
+          </div>
+          <div id="wf1QualityRow" class="labrow" style="margin-top:6px">
+            <span class="field-label" style="margin:0">JPG 品质</span>
+            <span class="spacer"></span>
+            <input type="range" id="wf1Quality" min="1" max="100" value="90" style="flex:1;min-width:0;accent-color:var(--ph-accent2)">
+            <span id="wf1QualityV" style="color:var(--ph-muted);font-size:var(--ph-text-sm);width:26px;text-align:right">90</span>
+          </div>
+          <label class="chk"><input type="checkbox" id="wf1Shrink" checked><span>仅缩小不放大（原图小于目标时保持原尺寸）</span></label>
+          <label class="chk"><input type="checkbox" id="wf1Backup" checked><span>覆盖前备份原图（同目录 文件名.bak，可手动恢复）</span></label>
+          <div class="actions"><button class="btn primary" id="wf1Run" disabled>开始批量处理</button></div>
+          <div id="wf1Busy" class="busy"><div class="spin"></div><span id="wf1BusyText">正在处理…</span></div>
+          <div id="wf1List"></div>
+        </div>
+
+        <!-- 工作流 2：一键导出当前文档 -->
+        <div class="tlbox" style="margin-bottom:0">
+          <div class="field-label">② 一键导出当前文档</div>
+          <div class="tlhint">把当前画布内容导出为图片文件。JPG / PNG / PDF 可多选，每种格式弹出一次保存位置，文件名自动为「文档名.扩展名」。PDF 内嵌 JPG 图像（品质跟随滑块），无需外部组件。</div>
+          <div id="wf2Fmt" style="margin-top:8px">
+            <label class="chk"><input type="checkbox" id="wf2Jpg" checked><span>JPG（品质可调）</span></label>
+            <div id="wf2QualityRow" class="labrow" style="margin:2px 0 4px 20px">
+              <span class="field-label" style="margin:0">品质</span>
+              <span class="spacer"></span>
+              <input type="range" id="wf2Quality" min="1" max="100" value="90" style="flex:1;min-width:0;accent-color:var(--ph-accent2)">
+              <span id="wf2QualityV" style="color:var(--ph-muted);font-size:var(--ph-text-sm);width:26px;text-align:right">90</span>
+            </div>
+            <label class="chk"><input type="checkbox" id="wf2Png" checked><span>PNG（无损）</span></label>
+            <label class="chk"><input type="checkbox" id="wf2Pdf"><span>PDF（单页 · 内嵌 JPG）</span></label>
+          </div>
+          <div class="actions"><button class="btn primary" id="wf2Run">导出当前文档</button></div>
+          <div id="wf2Busy" class="busy"><div class="spin"></div>正在导出…</div>
+          <div id="wf2Result"></div>
+        </div>
+      </div>
     </div>
 
   <!-- 生成图预览弹层 -->
@@ -812,10 +858,10 @@
 <script src="modules/presets.js"></script>
 <script src="modules/chat.js"></script>
 <script src="modules/create.js"></script>
-<script src="modules/merge.js"></script>
 <script src="modules/translate.js"></script>
 <script src="modules/outpaint.js"></script>
 <script src="modules/update.js"></script>
+<script src="modules/workflow.js"></script>
 <script src="modules/boot.js"></script>
 </body>
 </html>

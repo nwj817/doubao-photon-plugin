@@ -1,15 +1,16 @@
 "use strict";
 
-/* ========= 模块：create —— AI 创作（文生图 + 图生图合并）
-   无参考图 = 文生图；有参考图 = 图生图（含透明背景 / 反推提示词） ========= */
+/* ========= 模块：create —— AI 创作（文生图 / 图生图 / 多图融合）
+   0 张参考图 = 文生图；1 张 = 图生图；2-14 张 = 多图融合（Seedream 4.5） ========= */
 
 (function () {
   var DP = window.DP;
   if (!DP) throw new Error("core 未加载");
 
   var revText = "";
+  var MAX_REFS = 14;
 
-  /* ---------- 尺寸：固定比例 / 自定义像素（二选一，随模型切换档位） ---------- */
+  /* ---------- 尺寸：固定比例（随模型切换档位） ---------- */
   var GEN_SIZE_LIMITS = {
     "doubao-seedream-5-0-pro-260628":  { minPx: 921600,  maxPx: 4624220,  tiers: ["1K", "1.5K", "2K"] },
     "doubao-seedream-5-0-flash-260628": { minPx: 921600,  maxPx: 4624220,  tiers: ["1K", "1.5K", "2K"] },
@@ -69,27 +70,55 @@
     return px;
   }
 
-  /* ---------- 模式切换：无参考图 = 文生图；有参考图 = 图生图 ---------- */
+  function refCount() {
+    return (DP.state.create && DP.state.create.length) || 0;
+  }
+  function modeName() {
+    var n = refCount();
+    return n >= 2 ? "merge" : (n === 1 ? "edit" : "gen");
+  }
+
+  /* ---------- 模式切换：0 = 文生图，1 = 图生图，≥2 = 多图融合 ---------- */
   function updateCrMode() {
-    var hasRef = !!(DP.state.create && DP.state.create[0]);
-    var tagGen = DP.$("crModeTag"), tagEdit = DP.$("crModeTag2");
-    if (tagGen) tagGen.classList.toggle("on", !hasRef);
-    if (tagEdit) tagEdit.classList.toggle("on", hasRef);
+    var m = modeName();
+    var n = refCount();
+    var tagGen = DP.$("crModeTag"), tagEdit = DP.$("crModeTag2"), tagMerge = DP.$("crModeTag3");
+    if (tagGen) tagGen.classList.toggle("on", m === "gen");
+    if (tagEdit) tagEdit.classList.toggle("on", m === "edit");
+    if (tagMerge) tagMerge.classList.toggle("on", m === "merge");
     var hint = DP.$("crModeHint");
-    if (hint) hint.textContent = hasRef ? "图生图模式：将按参考图生成/编辑" : "文生图模式：无参考图，纯文字生成";
+    if (hint) {
+      if (m === "gen") hint.textContent = "文生图模式：无参考图，纯文字生成";
+      else if (m === "edit") hint.textContent = "图生图模式：按参考图生成 / 编辑";
+      else hint.textContent = "多图融合模式：已选 " + n + " 张参考图，请填写融合指令";
+    }
+    var label = DP.$("crPromptLabel");
+    if (label) label.textContent = m === "merge" ? "融合指令" : (m === "edit" ? "画面描述 / 编辑指令" : "画面描述");
+    var ta = DP.$("crPrompt");
+    if (ta) {
+      ta.placeholder = m === "merge" ? "例：将参考图中的产品放入参考图的场景中，保持产品外观与场景光影一致" :
+        (m === "edit" ? "写编辑指令（例：背景改为浅灰渐变，保留产品光影与透视，外壳改为黑色皮革材质）" :
+          "描述画面（例：白色磁吸补光灯悬浮在深色背景中，C4D超写实渲染，产品居中，柔和环形光效）");
+    }
+    /* 各模式专属参数显隐 */
+    var isMerge = m === "merge";
+    DP.$("crFixed").classList.toggle("hidden", isMerge);
+    DP.$("crSizeLabel").classList.toggle("hidden", isMerge);
+    DP.$("crModelRow").classList.toggle("hidden", isMerge);
+    DP.$("crMergeRow").classList.toggle("hidden", !isMerge);
     /* 透明背景仅图生图有意义，且仅 5.0 Pro/Flash 支持 */
     var wrap = DP.$("crTransparentWrap");
-    if (wrap) wrap.classList.toggle("hidden", !hasRef);
-    var m = DP.$("crModel").value;
-    var ok = m === "doubao-seedream-5-0-pro-260628" || m === "doubao-seedream-5-0-flash-260628";
+    if (wrap) wrap.classList.toggle("hidden", m !== "edit");
+    var mm = DP.$("crModel").value;
+    var ok = mm === "doubao-seedream-5-0-pro-260628" || mm === "doubao-seedream-5-0-flash-260628";
     var cb = DP.$("crTransparent");
     if (cb) {
-      cb.disabled = !ok || !hasRef;
-      if (!ok || !hasRef) cb.checked = false;
+      cb.disabled = !ok || m !== "edit";
+      if (!ok || m !== "edit") cb.checked = false;
     }
   }
 
-  /* 反推提示词动作：填入本页（合并后不再需要"去文生图"） */
+  /* 反推提示词动作：填入本页 */
   DP.registerAction("crFill", function () {
     DP.$("crPrompt").value = revText;
     DP.setFoot("已填入本页画面描述 / 编辑指令");
@@ -97,41 +126,56 @@
 
   /* 供 boot 移除参考图后刷新模式提示 */
   DP.updateCrMode = updateCrMode;
+  DP.refCount = refCount;
 
   DP.registerInit(function () {
-    /* ---------- 生成：无参考图 → 文生图；有参考图 → 图生图 ---------- */
+    /* ---------- 生成：0 张文生图 / 1 张图生图 / ≥2 融合 ---------- */
     DP.$("crRun").addEventListener("click", function () {
       var prompt = DP.$("crPrompt").value.trim();
-      if (!prompt) { DP.errInto("crResult", "请输入画面描述或编辑指令"); return; }
+      var m = modeName();
+      if (!prompt) {
+        DP.errInto("crResult", m === "merge" ? "请输入融合指令" : "请输入画面描述或编辑指令");
+        return;
+      }
       DP.clearErr("crResult");
-      var size = crSizeValue();
-      if (!size) return;
-      var model = DP.$("crModel").value;
-      var hasRef = !!(DP.state.create && DP.state.create[0]);
-      var body = { model: model, prompt: prompt, size: size, response_format: "b64_json", watermark: false };
-      if (hasRef) {
-        body.image = DP.state.create[0].uri;
-        if (DP.$("crTransparent").checked) {
-          body.background = "transparent";
-          body.output_format = "png";
+      var body = { prompt: prompt, response_format: "b64_json", watermark: false };
+      var label;
+      if (m === "merge") {
+        body.model = DP.$("crMergeModel").value;
+        body.size = DP.$("crMergeSize").value;
+        body.image = DP.state.create.map(function (p) { return p.uri; });
+        label = "多图融合 · " + body.model;
+      } else {
+        var size = crSizeValue();
+        if (!size) return;
+        body.model = DP.$("crModel").value;
+        body.size = size;
+        if (m === "edit") {
+          body.image = DP.state.create[0].uri;
+          if (DP.$("crTransparent").checked) {
+            body.background = "transparent";
+            body.output_format = "png";
+          }
+          label = "图生图 · " + body.model + (DP.$("crTransparent").checked ? " · 透明" : "");
+        } else {
+          label = "文生图 · " + body.model;
         }
       }
       DP.setBusy("crBusy", true);
       DP.imageGen(body)
         .then(DP.resolveImage)
         .then(function (r) {
-          var label = (hasRef ? "图生图 · " : "文生图 · ") + model + (hasRef && DP.$("crTransparent").checked ? " · 透明" : "");
           DP.imageResult("crResult", r.url, r.bytes, label);
           DP.pushHistory(label, r.bytes, r.url, prompt);
-          DP.setFoot((hasRef ? "编辑" : "生成") + "完成（" + size + "），已记入历史");
+          DP.setFoot("完成（" + (m === "merge" ? DP.$("crMergeSize").value : crSizeValue()) + "），已记入历史");
         })
         .catch(function (e) { DP.errInto("crResult", e.message || String(e)); })
         .finally(function () { DP.setBusy("crBusy", false); });
     });
 
-    /* ---------- 反推提示词 ---------- */
+    /* ---------- 反推提示词（使用第一张参考图） ---------- */
     DP.$("crReverse").addEventListener("click", function () {
-      if (!DP.state.create || !DP.state.create[0]) { DP.errInto("crReverseOut", "请先选择一张参考图（本地或画布）"); return; }
+      if (!DP.state.create || !DP.state.create[0]) { DP.errInto("crReverseOut", "请先添加一张参考图（本地或画布）"); return; }
       DP.clearErr("crReverseOut"); DP.setBusy("crRevBusy", true);
       var q = "分析这张参考图，反推用于生成类似效果的中文提示词：把正向提示词与负向提示词合并成一段完整描述（包含主体/材质/光影/构图/风格/色彩，以及需要避免的瑕疵与负面要素）。只输出合并后的中文提示词，不要输出英文，不要解释。";
       var content = [
@@ -153,14 +197,21 @@
         .finally(function () { DP.setBusy("crRevBusy", false); });
     });
 
-    /* ---------- 参考图：选图 / 画布取图（带并发锁，防连点） ---------- */
+    /* ---------- 参考图：追加模式（点一次加一张，上限 14） ---------- */
     DP.$("crPick").addEventListener("click", function () {
       var btn = this;
       btn.disabled = true;
       DP.pickImage(false).then(function (p) {
-        DP.state.create = p ? [p] : [];
-        DP.renderPicked("crPicked", p);
+        if (!p) return;
+        DP.state.create = DP.state.create || [];
+        if (DP.state.create.length >= MAX_REFS) {
+          DP.errInto("crResult", "最多 " + MAX_REFS + " 张参考图，请先移除多余的");
+          return;
+        }
+        DP.state.create.push(p);
+        DP.renderPicked("crPicked", DP.state.create);
         updateCrMode();
+        DP.setFoot("已添加本地图片（" + DP.state.create.length + " 张，可继续点按钮添加）");
       }).catch(function (e) { DP.errInto("crResult", e.message || String(e)); })
         .finally(function () { btn.disabled = false; });
     });
@@ -169,10 +220,16 @@
       btn.disabled = true;
       DP.setFoot("正在导出画布…");
       DP.canvasToRef().then(function (p) {
-        DP.state.create = p ? [p] : [];
-        DP.renderPicked("crPicked", p);
+        if (!p) return;
+        DP.state.create = DP.state.create || [];
+        if (DP.state.create.length >= MAX_REFS) {
+          DP.errInto("crResult", "最多 " + MAX_REFS + " 张参考图，请先移除多余的");
+          return;
+        }
+        DP.state.create.push(p);
+        DP.renderPicked("crPicked", DP.state.create);
         updateCrMode();
-        DP.setFoot("已从画布取图，当前为图生图模式");
+        DP.setFoot("已从画布取图（" + DP.state.create.length + " 张）");
       }).catch(function (e) {
         DP.errInto("crResult", e.message || String(e));
         DP.setFoot("从画布取图失败");

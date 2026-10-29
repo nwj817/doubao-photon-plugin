@@ -113,12 +113,12 @@
       if (!btn) return;
       var parts = String(btn.dataset.rm || "").split(":");
       var c = parts[0], idx = parseInt(parts[1] || "0", 10) || 0;
-      if (c === "crPicked") { DP.state.create = []; DP.$("crPicked").innerHTML = ""; if (DP.updateCrMode) DP.updateCrMode(); }
-      else if (c === "opPicked") { DP.state.op = null; DP.$("opPicked").innerHTML = ""; }
-      else if (c === "mergePicked" && DP.state.merge) {
-        DP.state.merge.splice(idx, 1);
-        DP.renderPicked("mergePicked", DP.state.merge);
+      if (c === "crPicked" && DP.state.create) {
+        DP.state.create.splice(idx, 1);
+        DP.renderPicked("crPicked", DP.state.create);
+        if (DP.updateCrMode) DP.updateCrMode();
       }
+      else if (c === "opPicked") { DP.state.op = null; DP.$("opPicked").innerHTML = ""; }
     });
   }
 

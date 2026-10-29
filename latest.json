@@ -1,5 +1,5 @@
 {
-  "version": "1.9.2",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.9.2.zip",
-  "note": "扩图重绘重做为「智能编辑」：擦除（框选即擦除，零输入）/ 标记改图（框选+指令重绘）/ 扩图（扩展画幅）/ 变清晰（画质增强，暂用增强重绘实现），统一取图-选模式-生成流程，选区坐标自动带入。"
+  "version": "1.10.0",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.10.0.zip",
+  "note": "新增「工作流」功能区（纯本地、零 AI 消耗）：①文件夹批量等比缩放·覆盖原图（选文件夹自动扫描 JPG/PNG/WebP，长边适配不拉伸，仅缩小默认开，覆盖前备份 .bak，输出格式可选 JPG/PNG，JPG 品质可调）；②一键导出当前文档为 JPG/PNG/PDF（JPG 品质可调，PDF 为内嵌 JPG 的单页文件，无需外部组件）。"
 }
