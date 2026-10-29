@@ -128,7 +128,7 @@
     return idx >= 0 ? s.slice(idx + 1) : s;
   }
 
-  /* ---------- 工作流 1：扫描文件夹 ---------- */
+  /* ---------- 工作流 1：扫描文件夹（含子目录） ---------- */
   /* 目录清单选择：常驻 <input webkitdirectory>，由页面 label 直连（真实用户手势触发，
      宿主不会拦截程序化 click）。重复选择同一文件夹时 input.value 相同不会触发 change，
      因此每次处理后立即清空 value。清单（相对路径）拿到后再走 SDK 授权拿绝对路径。 */
@@ -154,31 +154,71 @@
       DP.setFoot("文件夹中没有找到 JPG / PNG / WebP 图片");
       return;
     }
-    if (!DP.SDK || !DP.SDK.files || !DP.SDK.files.pick) {
+    authorizeList(list, function (absList) {
       btn.classList.remove("disabled");
-      DP.setFoot("SDK 文件能力不可用，请重启 Photon"); return;
+      wf1.files = absList;
+      renderWf1List();
+      DP.setFoot("已扫描 " + absList.length + " 张图片，可开始批量处理");
+    }, function (msg) {
+      btn.classList.remove("disabled");
+      DP.setFoot("扫描失败：" + msg);
+    });
+  }
+
+  /* ---------- 工作流 1：多选图片（可见图片，需位于同一文件夹根目录） ---------- */
+  function onFilesSelected() {
+    var input = DP.$("wf1FilesInput");
+    if (!input || !input.files || !input.files.length) return;
+    if (wf1.running) { DP.setFoot("正在处理中，请稍候"); input.value = ""; return; }
+    var btn = DP.$("wf1Files");
+    btn.classList.add("disabled");
+    var files = Array.prototype.slice.call(input.files);
+    input.value = "";
+    var list = [];
+    for (var i = 0; i < files.length; i++) {
+      var f = files[i];
+      if (!IMG_RE.test(f.name)) continue;
+      /* 多选框没有相对路径：图片视作位于授权文件夹根目录（name 即文件名） */
+      list.push({ name: f.name, rel: f.name, size: f.size || 0 });
     }
-    DP.setFoot("第 2 步：请再次选择同一个文件夹（获取写入授权）…");
+    if (!list.length) {
+      btn.classList.remove("disabled");
+      DP.setFoot("未选择到 JPG / PNG / WebP 图片");
+      return;
+    }
+    authorizeList(list, function (absList) {
+      btn.classList.remove("disabled");
+      wf1.files = absList;
+      renderWf1List();
+      DP.setFoot("已添加 " + absList.length + " 张图片，可开始批量处理");
+    }, function (msg) {
+      btn.classList.remove("disabled");
+      DP.setFoot("添加失败：" + msg);
+    });
+  }
+
+  /* 公共授权流程：SDK 文件夹框 → 拼接绝对路径 → 读取校验第 1 个文件（确认两次选择一致） */
+  function authorizeList(list, onOk, onErr) {
+    if (!DP.SDK || !DP.SDK.files || !DP.SDK.files.pick) {
+      onErr("SDK 文件能力不可用，请重启 Photon"); return;
+    }
+    DP.setFoot("请选择图片所在的同一个文件夹（获取写入授权）…");
     DP.SDK.files.pick({ folder: true }).then(function (folder) {
-      if (!folder) return null;
+      if (!folder) { onErr("已取消授权，未开始处理"); return; }
       wf1.folder = folder;
       list.forEach(function (it) { it.abs = joinPath(folder, it.rel); });
-      /* 校验：读第 1 个文件，确认授权路径与清单一致（不一致立刻明确报错，而不是处理时静默失败） */
       return DP.SDK.files.read(list[0].abs).then(function (u8) {
         if (!(u8 instanceof Uint8Array)) throw new Error("读取校验失败");
         return list;
       }).catch(function (e) {
-        throw new Error("两次选择的文件夹不一致或无权读取，请重新扫描。" +
+        throw new Error("两次选择的文件夹不一致，或图片不在所授权文件夹内。" +
           ((e && e.message) ? "\n" + e.message : ""));
       });
     }).then(function (list2) {
-      if (list2 === null) { DP.setFoot("已取消授权，未开始处理"); return; }
-      wf1.files = list2;
-      renderWf1List();
-      DP.setFoot("已扫描 " + list2.length + " 张图片，可开始批量处理");
+      if (list2) onOk(list2);
     }).catch(function (e) {
-      DP.setFoot("扫描失败：" + (e && e.message || e));
-    }).finally(function () { btn.classList.remove("disabled"); });
+      onErr(e && e.message || e);
+    });
   }
 
   /* ---------- 工作流 1：逐张添加（降级入口） ---------- */
@@ -423,6 +463,12 @@
     if (!DP.$("wf1Scan")) return; // 视图未挂载（异常降级）时不重复绑定
     var dirInput = DP.$("wf1DirInput");
     if (dirInput) dirInput.addEventListener("change", onDirSelected);
+    var filesInput = DP.$("wf1FilesInput");
+    if (filesInput) filesInput.addEventListener("change", onFilesSelected);
+    /* 目录选择框只显示子文件夹、不显示图片（Chromium 行为），点击前先给提示，避免误以为出错 */
+    DP.$("wf1Scan").addEventListener("click", function () {
+      DP.setFoot("文件夹框只显示子文件夹、不显示图片属正常，直接点「上传」即可；随后再选一次同一个文件夹获取写入权限");
+    });
     DP.$("wf1AddOne").addEventListener("click", addOne);
     DP.$("wf1Run").addEventListener("click", runWf1);
     DP.$("wf2Run").addEventListener("click", runWf2);

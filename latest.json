@@ -1,5 +1,5 @@
 {
-  "version": "1.10.1",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.10.1.zip",
-  "note": "修复工作流「选择文件夹并扫描」卡死/出错：目录选择改为用户手势直接触发（宿主不再拦截），扫描改为先取文件清单再取写入授权并自动校验首文件（两次选同一文件夹，选错立即明确提示）；建议选只含图片的子文件夹以加快扫描。"
+  "version": "1.10.2",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.10.2.zip",
+  "note": "工作流①新增「多选图片」入口：弹出的文件框可直接看到图片（解决目录框只显示子文件夹、看不到图片的困惑），选中后需再选一次同一文件夹获取写入权限。目录选择框触发前会提示：框内不显示图片属正常，直接点「上传」即可。"
 }
