@@ -295,7 +295,7 @@
     return DP.SDK.files.read(item.abs).then(function (u8) {
       if (!(u8 instanceof Uint8Array)) throw new Error("读取文件失败（可能未授权或超过 64MB）");
       item.orig = u8;
-      return DP.SDK.images.decode({ bytes: u8 });
+      return DP.SDK.images.decode(u8);
     }).then(function (img) {
       if (!img || !img.width || !img.height || !img.pixels) throw new Error("图片解码失败（格式不支持或超过 1600 万像素）");
       /* 目标尺寸：只填宽度→按宽度等比（高度自动跟随）；只填高度→按高度等比；都填→同时约束 */

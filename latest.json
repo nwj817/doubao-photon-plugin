@@ -1,5 +1,5 @@
 {
-  "version": "1.10.4",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.10.4.zip",
-  "note": "1) 修复工作流①扫描失败：系统目录框返回的文件路径自带所选文件夹名，与授权根拼接后多了一层目录（如 手电筒详情页优化\\手电筒详情页优化\\01_Hero.png）导致找不到文件，现已自动剥离并兼容选择上一级文件夹。2) 目标宽度/高度可只填其一，另一项按原图比例自动计算（等比缩放或放大）；都填则同时约束；勾选「仅缩小」仍可防止放大。"
+  "version": "1.10.5",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.10.5.zip",
+  "note": "修复工作流①批量处理全部报 Invalid image bytes：图片解码调用签名写错（多包了一层对象），现已改为与 SDK 一致的直接传字节数组。扫描列表已能正常显示，批量处理不再报解码错误。"
 }
