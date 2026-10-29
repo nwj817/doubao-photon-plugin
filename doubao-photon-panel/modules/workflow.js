@@ -8,7 +8,7 @@
       - 缩放：SDK.images.decode 解码为 RGBA → canvas 等比缩放（长边适配、不拉伸）→
         canvas.toBlob 编码 JPG/PNG（本地编码，无需外部组件）
       - 覆盖：仅当输出扩展名与原文件一致时覆盖原路径；不一致时写同名新扩展名文件
-      - 备份：默认覆盖前把原图写为「同目录 文件名.bak」（SDK 无 mkdir，备份走同目录可写路径）
+      - 覆盖：直接覆盖原文件（不保留备份，按用户要求）
    ② 一键导出当前文档（JPG / PNG / PDF）
       - 画布取图：documents.capture（用后立即 release 释放 token）
       - JPG/PNG：canvas.toBlob 编码；PDF：内联极简 PDF 生成器（DCTDecode 直嵌 JPG，单页）
@@ -294,7 +294,6 @@
     var fmt = wf1.fmt, q = wf1.quality;
     return DP.SDK.files.read(item.abs).then(function (u8) {
       if (!(u8 instanceof Uint8Array)) throw new Error("读取文件失败（可能未授权或超过 64MB）");
-      item.orig = u8;
       return DP.SDK.images.decode(u8);
     }).then(function (img) {
       if (!img || !img.width || !img.height || !img.pixels) throw new Error("图片解码失败（格式不支持或超过 1600 万像素）");
@@ -313,17 +312,12 @@
       return canvasToBlob(dst, type, fmt === "jpg" ? q / 100 : undefined).then(blobToBytes);
     }).then(function (outBytes) {
       var ext = fmt === "jpg" ? ".jpg" : ".png";
-      var lower = item.abs.toLowerCase();
       var target;
       if (fmt === "jpg" && /\.jpe?g$/i.test(item.abs)) target = item.abs;
       else if (fmt === "png" && /\.png$/i.test(item.abs)) target = item.abs;
       else target = item.abs.replace(/\.[^.]+$/, "") + ext;
-      var backupStep = (wf1.backup && target === item.abs && !item.backed)
-        ? DP.SDK.files.write(item.abs + ".bak", item.orig).then(function () { item.backed = true; })
-        : Promise.resolve();
-      return backupStep.then(function () {
-        return DP.SDK.files.write(target, outBytes);
-      }).then(function () {
+      /* 不保留备份，直接覆盖原文件 */
+      return DP.SDK.files.write(target, outBytes).then(function () {
         return { target: target, size: outBytes.length };
       });
     });
@@ -340,7 +334,6 @@
     wf1.th = h > 0 ? h : 0;
     wf1.fmt = wf1.fmt; wf1.quality = parseInt(DP.$("wf1Quality").value, 10) || 90;
     wf1.shrinkOnly = DP.$("wf1Shrink").checked;
-    wf1.backup = DP.$("wf1Backup").checked;
     wf1.running = true;
     renderWf1List();
     DP.setBusy("wf1Busy", true);
@@ -375,7 +368,6 @@
         }
         if (fails.length > 20) lines.push("…等 " + fails.length + " 个失败项");
       }
-      if (wf1.backup) lines.push("已开启原图备份：同目录「文件名.bak」可手动恢复");
       DP.$("wf1List").innerHTML = '<div class="result"><div class="rhead"><div class="dot"></div>' +
         '<div class="ttl">批量处理完成</div></div><pre>' + DP.esc(lines.join("\n")) + "</pre></div>";
       DP.setFoot("工作流 1 完成：成功 " + ok + "，失败 " + fails.length);
