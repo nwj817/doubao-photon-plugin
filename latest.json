@@ -1,5 +1,5 @@
 {
-  "version": "1.10.0",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.10.0.zip",
-  "note": "新增「工作流」功能区（纯本地、零 AI 消耗）：①文件夹批量等比缩放·覆盖原图（选文件夹自动扫描 JPG/PNG/WebP，长边适配不拉伸，仅缩小默认开，覆盖前备份 .bak，输出格式可选 JPG/PNG，JPG 品质可调）；②一键导出当前文档为 JPG/PNG/PDF（JPG 品质可调，PDF 为内嵌 JPG 的单页文件，无需外部组件）。"
+  "version": "1.10.1",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.10.1.zip",
+  "note": "修复工作流「选择文件夹并扫描」卡死/出错：目录选择改为用户手势直接触发（宿主不再拦截），扫描改为先取文件清单再取写入授权并自动校验首文件（两次选同一文件夹，选错立即明确提示）；建议选只含图片的子文件夹以加快扫描。"
 }

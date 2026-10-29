@@ -129,65 +129,56 @@
   }
 
   /* ---------- 工作流 1：扫描文件夹 ---------- */
-  function pickDirFiles() {
-    return new Promise(function (resolve) {
-      var input = document.createElement("input");
-      input.type = "file";
-      try { input.setAttribute("webkitdirectory", ""); } catch (e) { }
-      input.setAttribute("directory", "");
-      input.multiple = true;
-      input.style.display = "none";
-      document.body.appendChild(input);
-      var done = false;
-      input.addEventListener("change", function () {
-        if (done) return;
-        done = true;
-        var files = Array.prototype.slice.call(input.files || []);
-        if (input.parentNode) input.parentNode.removeChild(input);
-        resolve(files);
-      });
-      input.click();
-    });
-  }
-
-  function scan() {
+  /* 目录清单选择：常驻 <input webkitdirectory>，由页面 label 直连（真实用户手势触发，
+     宿主不会拦截程序化 click）。重复选择同一文件夹时 input.value 相同不会触发 change，
+     因此每次处理后立即清空 value。清单（相对路径）拿到后再走 SDK 授权拿绝对路径。 */
+  function onDirSelected() {
+    var input = DP.$("wf1DirInput");
+    if (!input || !input.files || !input.files.length) return;
+    if (wf1.running) { DP.setFoot("正在处理中，请稍候"); input.value = ""; return; }
+    var btn = DP.$("wf1Scan");
+    btn.classList.add("disabled");
+    var files = Array.prototype.slice.call(input.files);
+    input.value = "";
+    DP.setFoot("正在读取文件清单…（文件夹较大时可能需要几秒~十几秒）");
+    var list = [];
+    for (var i = 0; i < files.length; i++) {
+      var f = files[i];
+      var rel = f.webkitRelativePath || "";
+      if (!rel) continue;
+      if (!IMG_RE.test(f.name)) continue;
+      list.push({ name: f.name, rel: rel, size: f.size || 0 });
+    }
+    if (!list.length) {
+      btn.classList.remove("disabled");
+      DP.setFoot("文件夹中没有找到 JPG / PNG / WebP 图片");
+      return;
+    }
     if (!DP.SDK || !DP.SDK.files || !DP.SDK.files.pick) {
+      btn.classList.remove("disabled");
       DP.setFoot("SDK 文件能力不可用，请重启 Photon"); return;
     }
-    var btn = DP.$("wf1Scan");
-    btn.disabled = true;
-    DP.setFoot("第 1 步：请选择要处理的文件夹…（第 2 步会再选一次同一个文件夹以读取文件清单）");
+    DP.setFoot("第 2 步：请再次选择同一个文件夹（获取写入授权）…");
     DP.SDK.files.pick({ folder: true }).then(function (folder) {
-      if (!folder) { DP.setFoot("已取消选择文件夹"); return null; }
-      DP.setFoot("第 2 步：请再次选择同一个文件夹（用于读取文件清单）…");
-      return pickDirFiles().then(function (files) {
-        if (!files || !files.length) return null;
-        var list = [];
-        for (var i = 0; i < files.length; i++) {
-          var f = files[i];
-          var rel = f.webkitRelativePath || "";
-          if (!rel) continue;
-          if (!IMG_RE.test(f.name)) continue;
-          list.push({ name: f.name, abs: joinPath(folder, rel), rel: rel, size: f.size || 0 });
-        }
-        return list;
-      });
-    }).then(function (list) {
-      if (list === null) {
-        DP.setFoot("已取消选择文件夹");
-        return;
-      }
-      if (!list.length) {
-        DP.setFoot("文件夹中没有找到 JPG / PNG / WebP 图片（若两次选择的文件夹不一致，请重新扫描）");
-        return;
-      }
+      if (!folder) return null;
       wf1.folder = folder;
-      wf1.files = list;
+      list.forEach(function (it) { it.abs = joinPath(folder, it.rel); });
+      /* 校验：读第 1 个文件，确认授权路径与清单一致（不一致立刻明确报错，而不是处理时静默失败） */
+      return DP.SDK.files.read(list[0].abs).then(function (u8) {
+        if (!(u8 instanceof Uint8Array)) throw new Error("读取校验失败");
+        return list;
+      }).catch(function (e) {
+        throw new Error("两次选择的文件夹不一致或无权读取，请重新扫描。" +
+          ((e && e.message) ? "\n" + e.message : ""));
+      });
+    }).then(function (list2) {
+      if (list2 === null) { DP.setFoot("已取消授权，未开始处理"); return; }
+      wf1.files = list2;
       renderWf1List();
-      DP.setFoot("已扫描 " + list.length + " 张图片");
+      DP.setFoot("已扫描 " + list2.length + " 张图片，可开始批量处理");
     }).catch(function (e) {
       DP.setFoot("扫描失败：" + (e && e.message || e));
-    }).finally(function () { btn.disabled = false; });
+    }).finally(function () { btn.classList.remove("disabled"); });
   }
 
   /* ---------- 工作流 1：逐张添加（降级入口） ---------- */
@@ -430,7 +421,8 @@
   /* ---------- 初始化绑定 ---------- */
   DP.registerInit(function () {
     if (!DP.$("wf1Scan")) return; // 视图未挂载（异常降级）时不重复绑定
-    DP.$("wf1Scan").addEventListener("click", scan);
+    var dirInput = DP.$("wf1DirInput");
+    if (dirInput) dirInput.addEventListener("change", onDirSelected);
     DP.$("wf1AddOne").addEventListener("click", addOne);
     DP.$("wf1Run").addEventListener("click", runWf1);
     DP.$("wf2Run").addEventListener("click", runWf2);

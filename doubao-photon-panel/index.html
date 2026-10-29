@@ -131,6 +131,7 @@
   }
   .btn:active:not(:disabled){transform:scale(var(--ph-press-scale));}
   .btn:disabled{opacity:0.45;cursor:default;background:transparent;box-shadow:none;}
+  .btn.disabled{opacity:0.45;cursor:default;background:transparent;box-shadow:none;pointer-events:none;}
   .btn.primary{
     color:#fff;background:linear-gradient(120deg,#22d3ee 0%,#818cf8 50%,#a855f7 100%);
     box-shadow:var(--ph-glow-btn),inset 0 1px 0 rgba(255,255,255,0.28);
@@ -735,10 +736,11 @@
         <!-- 工作流 1：文件夹批量等比缩放 · 覆盖原图 -->
         <div class="tlbox">
           <div class="field-label">① 批量等比缩放 · 覆盖原图</div>
-          <div class="tlhint">选文件夹自动扫描图片（JPG / PNG / WebP）→ 按目标尺寸等比缩放（长边适配、不拉伸）→ 覆盖原文件。全程本地处理，不消耗 AI 额度。</div>
+          <div class="tlhint">选文件夹自动扫描图片（JPG / PNG / WebP）→ 按目标尺寸等比缩放（长边适配、不拉伸）→ 覆盖原文件。全程本地处理，不消耗 AI 额度。操作：先选一次文件夹读取清单，再选一次<b>同一个文件夹</b>获取写入权限（两次自动校验，选错会明确提示）。建议选只含图片的子文件夹，勿选磁盘根目录，扫描更快。</div>
           <div class="pickrow" style="margin-top:9px">
-            <button class="btn" id="wf1Scan">选择文件夹并扫描</button>
-            <button class="btn" id="wf1AddOne" title="宿主不支持文件夹扫描时的备选：逐张选择图片加入列表">逐张添加</button>
+            <label for="wf1DirInput" class="btn" id="wf1Scan">选择文件夹并扫描</label>
+            <input type="file" id="wf1DirInput" webkitdirectory multiple accept=".jpg,.jpeg,.png,.webp" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none">
+            <button class="btn" id="wf1AddOne" title="宿主不支持文件夹扫描时的备选：逐张选择图片加入列表（同样覆盖原图）">逐张选择</button>
           </div>
           <div class="repo-status" id="wf1Meta"></div>
           <div class="row" style="margin-top:10px">
