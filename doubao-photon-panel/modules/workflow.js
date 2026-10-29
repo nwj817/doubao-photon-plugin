@@ -147,7 +147,11 @@
       var rel = f.webkitRelativePath || "";
       if (!rel) continue;
       if (!IMG_RE.test(f.name)) continue;
-      list.push({ name: f.name, rel: rel, size: f.size || 0 });
+      /* webkitRelativePath 的第一段是所选文件夹名，必须剥离，否则与授权根路径拼接会重复目录名
+         （例如授权根 D:\...\手电筒详情页优化 + rel 手电筒详情页优化\01_Hero.png → 路径重复报 ENOENT） */
+      var relStripped = rel.replace(/^[^\/]+\//, "");
+      if (!relStripped) continue;
+      list.push({ name: f.name, rel: relStripped, relFull: rel, size: f.size || 0 });
     }
     if (!list.length) {
       btn.classList.remove("disabled");
@@ -197,7 +201,11 @@
     });
   }
 
-  /* 公共授权流程：SDK 文件夹框 → 拼接绝对路径 → 读取校验第 1 个文件（确认两次选择一致） */
+  /* 公共授权流程：SDK 文件夹框 → 拼接绝对路径 → 读取校验第 1 个文件。
+     两次选择层级可能不同，自动尝试两种拼法：
+       A. 授权根 + 剥离文件夹名的相对路径（两次选了同一个文件夹）
+       B. 授权根 + 原始相对路径（第二次选了上一级文件夹）
+     用第 1 个文件试读确定生效模式，再对全部文件按该模式生成绝对路径。 */
   function authorizeList(list, onOk, onErr) {
     if (!DP.SDK || !DP.SDK.files || !DP.SDK.files.pick) {
       onErr("SDK 文件能力不可用，请重启 Photon"); return;
@@ -206,13 +214,27 @@
     DP.SDK.files.pick({ folder: true }).then(function (folder) {
       if (!folder) { onErr("已取消授权，未开始处理"); return; }
       wf1.folder = folder;
-      list.forEach(function (it) { it.abs = joinPath(folder, it.rel); });
-      return DP.SDK.files.read(list[0].abs).then(function (u8) {
+      var first = list[0];
+      var pA = joinPath(folder, first.rel);                 // 剥离文件夹名
+      var pB = joinPath(folder, first.relFull || first.rel); // 原始（含文件夹名）
+      var mode = null;
+      return DP.SDK.files.read(pA).then(function (u8) {
         if (!(u8 instanceof Uint8Array)) throw new Error("读取校验失败");
+        mode = "stripped";
+      }).catch(function (e1) {
+        /* A 失败 → 试 B；若 A 是校验失败而非路径不存在，仍继续试 B，B 也失败才整体报错 */
+        return DP.SDK.files.read(pB).then(function (u8) {
+          if (!(u8 instanceof Uint8Array)) throw new Error("读取校验失败");
+          mode = "full";
+        }).catch(function (e2) {
+          throw new Error("两次选择的文件夹不一致，或图片不在所授权文件夹内。\n已尝试：\n" + pA + "\n" + pB +
+            ((e2 && e2.message) ? "\n" + e2.message : ""));
+        });
+      }).then(function () {
+        list.forEach(function (it) {
+          it.abs = joinPath(folder, mode === "stripped" ? it.rel : (it.relFull || it.rel));
+        });
         return list;
-      }).catch(function (e) {
-        throw new Error("两次选择的文件夹不一致，或图片不在所授权文件夹内。" +
-          ((e && e.message) ? "\n" + e.message : ""));
       });
     }).then(function (list2) {
       if (list2) onOk(list2);
@@ -276,7 +298,11 @@
       return DP.SDK.images.decode({ bytes: u8 });
     }).then(function (img) {
       if (!img || !img.width || !img.height || !img.pixels) throw new Error("图片解码失败（格式不支持或超过 1600 万像素）");
-      var scale = Math.min(wf1.tw / img.width, wf1.th / img.height);
+      /* 目标尺寸：只填宽度→按宽度等比（高度自动跟随）；只填高度→按高度等比；都填→同时约束 */
+      var scale;
+      if (wf1.tw > 0 && wf1.th > 0) scale = Math.min(wf1.tw / img.width, wf1.th / img.height);
+      else if (wf1.tw > 0) scale = wf1.tw / img.width;
+      else scale = wf1.th / img.height;
       if (wf1.shrinkOnly && scale > 1) scale = 1;
       var dw = Math.max(1, Math.round(img.width * scale));
       var dh = Math.max(1, Math.round(img.height * scale));
@@ -307,10 +333,11 @@
   function runWf1() {
     var w = parseInt(DP.$("wf1W").value, 10);
     var h = parseInt(DP.$("wf1H").value, 10);
-    if (!(w > 0) || !(h > 0)) { DP.setFoot("请填写有效的目标宽度与高度"); return; }
+    if (!(w > 0) && !(h > 0)) { DP.setFoot("请填写目标宽度或高度（可只填其一，另一项按比例自动计算）"); return; }
     if (w > 8192 || h > 8192) { DP.setFoot("目标尺寸不能超过 8192px"); return; }
     if (!wf1.files.length) { DP.setFoot("请先扫描文件夹或逐张添加图片"); return; }
-    wf1.tw = w; wf1.th = h;
+    wf1.tw = w > 0 ? w : 0;
+    wf1.th = h > 0 ? h : 0;
     wf1.fmt = wf1.fmt; wf1.quality = parseInt(DP.$("wf1Quality").value, 10) || 90;
     wf1.shrinkOnly = DP.$("wf1Shrink").checked;
     wf1.backup = DP.$("wf1Backup").checked;

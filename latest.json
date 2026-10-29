@@ -1,5 +1,5 @@
 {
-  "version": "1.10.2",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.10.2.zip",
-  "note": "工作流①新增「多选图片」入口：弹出的文件框可直接看到图片（解决目录框只显示子文件夹、看不到图片的困惑），选中后需再选一次同一文件夹获取写入权限。目录选择框触发前会提示：框内不显示图片属正常，直接点「上传」即可。"
+  "version": "1.10.4",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.10.4.zip",
+  "note": "1) 修复工作流①扫描失败：系统目录框返回的文件路径自带所选文件夹名，与授权根拼接后多了一层目录（如 手电筒详情页优化\\手电筒详情页优化\\01_Hero.png）导致找不到文件，现已自动剥离并兼容选择上一级文件夹。2) 目标宽度/高度可只填其一，另一项按原图比例自动计算（等比缩放或放大）；都填则同时约束；勾选「仅缩小」仍可防止放大。"
 }
