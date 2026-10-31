@@ -28,3 +28,4 @@
 [1029/104008.058:ERROR:third_party\crashpad\crashpad\util\win\registration_protocol_win.cc:136] TransactNamedPipe: 有更多数据可用。 (0xEA)
 [1029/104008.099:ERROR:third_party\crashpad\crashpad\util\win\registration_protocol_win.cc:136] TransactNamedPipe: 有更多数据可用。 (0xEA)
 [1029/104013.467:ERROR:third_party\crashpad\crashpad\util\win\registration_protocol_win.cc:136] TransactNamedPipe: 有更多数据可用。 (0xEA)
+[1029/104207.943:ERROR:third_party\crashpad\crashpad\util\win\registration_protocol_win.cc:136] TransactNamedPipe: 有更多数据可用。 (0xEA)

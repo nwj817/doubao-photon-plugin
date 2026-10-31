@@ -26,7 +26,7 @@
     return (
       '<div style="font-size:var(--ph-text-sm);margin-bottom:8px">发现新版本：<b style="color:var(--ph-accent);font-size:var(--ph-text-md)">v' + DP.esc(latest) + "</b>（当前 v" + DP.esc(DP.PLUGIN_VERSION) + "）</div>" +
       (data.note ? '<div style="margin-bottom:10px;white-space:pre-wrap">' + DP.esc(data.note) + "</div>" : "") +
-      '<div style="margin-bottom:10px">点「立即更新」自动下载并覆盖安装，完成后重启 Photon 即可。</div>' +
+      '<div style="margin-bottom:10px">点「立即更新」自动下载并覆盖安装，完成后自动热更新生效，无需重启 Photon。</div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
       '<button class="btn primary" data-act="autoupd" data-url="' + DP.escAttr(data.zip || "") + '">立即更新</button>' +
       '<button class="btn" data-act="dlzip" data-url="' + DP.escAttr(data.zip || "") + '">手动下载 zip</button>' +
@@ -249,12 +249,21 @@
       });
     }).then(function (res) {
       console.log("[update] auto-update done:", res);
+      /* 热更新：覆盖完成后自动刷新当前面板，新版本代码立即生效（宿主 preload 会在新导航重新注入 SDK）。
+         若刷新被宿主拦截，5 秒后给出重启降级提示。 */
+      var reloaded = false;
+      window.addEventListener("beforeunload", function () { reloaded = true; });
       renderUpdateInfo(
         '<div style="padding:10px 4px">' +
         '<div style="color:var(--ph-accent);margin-bottom:8px">自动更新完成（覆盖 ' + res.count + " 个文件）</div>" +
-        '<div style="margin-top:8px;color:var(--ph-muted)">请退出并重启 Photon Studio 后生效。</div></div>'
+        '<div style="margin-top:8px;color:var(--ph-muted)">正在自动刷新面板热更新，无需重启 Photon…</div></div>'
       );
-      DP.setFoot("更新完成，重启 Photon 后生效");
+      DP.setFoot("更新完成，正在热更新…");
+      try { localStorage.setItem("doubao.afterUpdate", JSON.stringify({ t: Date.now() })); } catch (e) { }
+      setTimeout(function () { if (!reloaded) location.reload(); }, 1200);
+      setTimeout(function () {
+        if (!reloaded) renderUpdateInfo("面板刷新被宿主拦截，请手动退出并重启 Photon Studio（文件已覆盖为最新版）。");
+      }, 5000);
     }).catch(function (e) {
       DP.setFoot("自动更新失败");
       renderUpdateInfo(
@@ -301,5 +310,13 @@
       else checkUpdate(false);
     });
     DP.$("updToastClose").addEventListener("click", function () { hideUpdateToast(false); });
+    /* 热更新完成标记：刷新后提示一次新版本号 */
+    try {
+      var au = JSON.parse(localStorage.getItem("doubao.afterUpdate") || "null");
+      if (au && au.t) {
+        localStorage.removeItem("doubao.afterUpdate");
+        DP.setFoot("已热更新至 v" + DP.PLUGIN_VERSION);
+      }
+    } catch (e) { }
   });
 })();

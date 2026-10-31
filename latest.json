@@ -1,5 +1,5 @@
 {
-  "version": "1.10.6",
-  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.10.6.zip",
-  "note": "工作流①取消原图备份行为：批量处理直接覆盖原文件，不再生成 .bak 备份，界面移除备份选项。"
+  "version": "1.10.7",
+  "zip": "https://raw.githubusercontent.com/nwj817/doubao-photon-plugin/main/releases/doubao-photon-panel-v1.10.7.zip",
+  "note": "支持热更新：检查更新发现新版本后，点「立即更新」自动下载并覆盖安装，完成后面板自动刷新生效，无需重启 Photon Studio。"
 }
